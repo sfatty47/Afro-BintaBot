@@ -53,6 +53,53 @@ CULTURAL_KNOWLEDGE = {
             "Their role is hereditary, passed down through family lines"
         ]
     },
+    "historical_figures": {
+        "sundiata_keita": {
+            "name": "Sundiata Keita",
+            "title": "Founder of the Mali Empire",
+            "period": "1217-1255 CE",
+            "achievements": [
+                "Founded the Mali Empire in 1235 CE",
+                "Unified the Mandinka people",
+                "Established the foundation for one of Africa's greatest empires",
+                "Known as the 'Lion King' or 'Lion Prince'",
+                "Created a strong administrative system",
+                "Promoted trade and Islamic learning"
+            ],
+            "legacy": "Sundiata Keita's leadership and vision created the foundation for the Mali Empire, which would later become one of the wealthiest and most powerful empires in African history under Mansa Musa.",
+            "story": "According to oral tradition, Sundiata was born disabled but overcame his challenges to become a great warrior and leader. His story is preserved by griots and teaches us about resilience, leadership, and the power of unity."
+        },
+        "dawda_jawara": {
+            "name": "Sir Dawda Kairaba Jawara",
+            "title": "First President of The Gambia",
+            "period": "1965-1994",
+            "achievements": [
+                "Led The Gambia to independence from Britain in 1965",
+                "Served as Prime Minister (1962-1970) and President (1970-1994)",
+                "Established democratic governance in The Gambia",
+                "Promoted education and healthcare",
+                "Maintained peaceful relations with neighboring countries",
+                "Known for his commitment to democracy and human rights"
+            ],
+            "legacy": "Sir Dawda Jawara is remembered as the 'Father of The Gambia' for his role in leading the country to independence and establishing democratic institutions. He was known for his gentle leadership style and commitment to peace.",
+            "background": "Born in 1924, Jawara was originally trained as a veterinarian before entering politics. He led The Gambia through its transition from British colony to independent nation."
+        },
+        "mansa_musa": {
+            "name": "Mansa Musa",
+            "title": "Emperor of the Mali Empire",
+            "period": "1312-1337 CE",
+            "achievements": [
+                "Ruled the Mali Empire at its peak",
+                "Conducted the famous Hajj pilgrimage to Mecca",
+                "Distributed so much gold that it caused inflation in the Mediterranean",
+                "Built the University of Timbuktu",
+                "Established Mali as a center of Islamic learning",
+                "Expanded the empire's territory and influence"
+            ],
+            "legacy": "Mansa Musa is considered one of the wealthiest people in history. His pilgrimage to Mecca in 1324 brought Mali to the attention of the world and established its reputation as a land of great wealth and learning.",
+            "story": "Mansa Musa's famous pilgrimage included 60,000 people, 12,000 slaves, and so much gold that he gave it away freely, causing the price of gold to drop in the regions he visited."
+        }
+    },
     "proverbs": {
         "wisdom": [
             "It takes a village to raise a child",
@@ -251,8 +298,63 @@ def get_cultural_response(user_input: str) -> str:
     """
     input_lower = user_input.lower()
     
+    # Check for historical figures first
+    if any(word in input_lower for word in ["sundiata", "keita", "sundiata keita"]):
+        figure_info = CULTURAL_KNOWLEDGE["historical_figures"]["sundiata_keita"]
+        return f"""Ah, Sundiata Keita! Let me share with you the story of this legendary founder of the Mali Empire...
+
+Sundiata Keita was the **{figure_info['title']}** during {figure_info['period']}. 
+
+**Key Achievements:**
+{', '.join(figure_info['achievements'])}
+
+**Legacy:**
+{figure_info['legacy']}
+
+{figure_info['story']}
+
+Sundiata's story teaches us about resilience, leadership, and the power of unity. Like the great baobab tree, his influence continues to provide shade and wisdom for generations to come.
+
+Would you like to learn more about the Mali Empire that Sundiata founded or the griots who preserve his story?"""
+
+    elif any(word in input_lower for word in ["dawda", "jawara", "dawda jawara", "sir dawda"]):
+        figure_info = CULTURAL_KNOWLEDGE["historical_figures"]["dawda_jawara"]
+        return f"""Ah, Sir Dawda Kairaba Jawara! Let me share with you the story of this remarkable leader of The Gambia...
+
+Sir Dawda Jawara was the **{figure_info['title']}** during {figure_info['period']}. 
+
+**Key Achievements:**
+{', '.join(figure_info['achievements'])}
+
+**Legacy:**
+{figure_info['legacy']}
+
+{figure_info['background']}
+
+Sir Dawda Jawara's story teaches us about democratic leadership, peaceful transition, and the importance of education and healthcare for a nation's development.
+
+Would you like to learn more about The Gambia's journey to independence or other African independence leaders?"""
+
+    elif any(word in input_lower for word in ["mansa musa", "mansa"]):
+        figure_info = CULTURAL_KNOWLEDGE["historical_figures"]["mansa_musa"]
+        return f"""Ah, Mansa Musa! Let me share with you the story of this legendary emperor of the Mali Empire...
+
+Mansa Musa was the **{figure_info['title']}** during {figure_info['period']}. 
+
+**Key Achievements:**
+{', '.join(figure_info['achievements'])}
+
+**Legacy:**
+{figure_info['legacy']}
+
+{figure_info['story']}
+
+Mansa Musa's story teaches us about the wealth and sophistication of African empires, the importance of education and learning, and the power of cultural exchange.
+
+Would you like to learn more about the Mali Empire at its peak or the University of Timbuktu that Mansa Musa built?"""
+
     # Check for specific topics and provide detailed responses
-    if any(word in input_lower for word in ["ubuntu", "philosophy", "community"]):
+    elif any(word in input_lower for word in ["ubuntu", "philosophy", "community"]):
         ubuntu_info = CULTURAL_KNOWLEDGE["ubuntu"]
         return f"""Ah, my child, you ask about Ubuntu - the very heart of our African wisdom!
 

@@ -18,6 +18,29 @@ class AfricanRAGSystem:
         """
         chunks = []
         
+        # Historical figures chunks
+        for figure_key, figure_info in CULTURAL_KNOWLEDGE["historical_figures"].items():
+            chunks.extend([
+                {
+                    "content": f"{figure_info['name']} - {figure_info['title']} ({figure_info['period']})",
+                    "topic": figure_key,
+                    "category": "historical_figure",
+                    "keywords": [figure_info['name'].lower(), figure_key, "leader", "president", "emperor", "founder"]
+                },
+                {
+                    "content": f"{figure_info['name']} achievements: {', '.join(figure_info['achievements'])}",
+                    "topic": figure_key,
+                    "category": "historical_figure",
+                    "keywords": [figure_info['name'].lower(), figure_key, "achievements", "accomplishments"]
+                },
+                {
+                    "content": f"{figure_info['name']} legacy: {figure_info['legacy']}",
+                    "topic": figure_key,
+                    "category": "historical_figure",
+                    "keywords": [figure_info['name'].lower(), figure_key, "legacy", "impact", "influence"]
+                }
+            ])
+        
         # Ubuntu chunks
         ubuntu_info = CULTURAL_KNOWLEDGE["ubuntu"]
         chunks.extend([
@@ -153,6 +176,12 @@ class AfricanRAGSystem:
         for chunk in self.knowledge_chunks:
             score = 0
             
+            # Exact name matching (highest priority)
+            if chunk["category"] == "historical_figure":
+                figure_name = chunk["keywords"][0]  # First keyword is the name
+                if figure_name in query_lower:
+                    score += 10  # Very high score for exact name match
+            
             # Keyword matching
             for keyword in chunk["keywords"]:
                 if keyword.lower() in query_lower:
@@ -207,6 +236,10 @@ class AfricanRAGSystem:
         topics = [chunk["topic"] for chunk in chunks]
         main_topic = max(set(topics), key=topics.count) if topics else "general"
         
+        # Check for historical figures first (highest priority)
+        if main_topic in CULTURAL_KNOWLEDGE["historical_figures"]:
+            return self._generate_historical_figure_response(query, context, chunks, main_topic)
+        
         # Generate appropriate response based on topic
         if main_topic == "ubuntu":
             return self._generate_ubuntu_response(query, context, chunks)
@@ -222,6 +255,28 @@ class AfricanRAGSystem:
             return self._generate_art_response(query, context, chunks)
         else:
             return self._generate_general_response(query, context, chunks)
+    
+    def _generate_historical_figure_response(self, query: str, context: str, chunks: List[Dict], figure_key: str) -> str:
+        """Generate specific response for historical figures"""
+        figure_info = CULTURAL_KNOWLEDGE["historical_figures"][figure_key]
+        
+        return f"""Ah, {figure_info['name']}! Let me share with you the story of this remarkable African leader...
+
+{context}
+
+{figure_info['name']} was {figure_info['title']} during {figure_info['period']}. 
+
+**Key Achievements:**
+{', '.join(figure_info['achievements'])}
+
+**Legacy:**
+{figure_info['legacy']}
+
+{figure_info['story']}
+
+{figure_info['name']}'s story teaches us about leadership, vision, and the power of determination. Like the great baobab tree, their influence continues to provide shade and wisdom for generations to come.
+
+Would you like to learn more about the historical context of {figure_info['name']}'s time or their impact on African history?"""
     
     def _generate_ubuntu_response(self, query: str, context: str, chunks: List[Dict]) -> str:
         """Generate Ubuntu-specific response"""
