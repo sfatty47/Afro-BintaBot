@@ -1,14 +1,10 @@
 import streamlit as st
-import speech_recognition as sr
-import pyttsx3
-import threading
-import time
 from chatbot import culturally_aware_chat
 
 # Page configuration
 st.set_page_config(
-    page_title="BintaBot - African Voice Assistant",
-    page_icon="🎤",
+    page_title="BintaBot - African Cultural Assistant",
+    page_icon="🌍",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -24,14 +20,6 @@ st.markdown("""
         text-align: center;
         margin-bottom: 2rem;
     }
-    .voice-button {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 25px;
-        cursor: pointer;
-    }
     .chat-message {
         padding: 1rem;
         border-radius: 10px;
@@ -45,96 +33,50 @@ st.markdown("""
         background-color: #f3e5f5;
         border-left: 4px solid #9c27b0;
     }
+    .feature-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        color: white;
+        margin: 0.5rem 0;
+    }
 </style>
 """, unsafe_allow_html=True)
-
-# Initialize speech recognition and TTS
-@st.cache_resource
-def init_voice():
-    try:
-        recognizer = sr.Recognizer()
-        microphone = sr.Microphone()
-        tts_engine = pyttsx3.init()
-        
-        # Configure TTS voice
-        voices = tts_engine.getProperty('voices')
-        if voices:
-            for voice in voices:
-                if 'female' in voice.name.lower() or 'samantha' in voice.name.lower():
-                    tts_engine.setProperty('voice', voice.id)
-                    break
-        
-        tts_engine.setProperty('rate', 150)
-        tts_engine.setProperty('volume', 0.9)
-        
-        return recognizer, microphone, tts_engine
-    except Exception as e:
-        st.error(f"Voice system initialization failed: {e}")
-        return None, None, None
-
-def listen_for_speech(recognizer, microphone):
-    """Listen for voice input"""
-    try:
-        with microphone as source:
-            st.info("🎤 Listening... Speak now!")
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
-        
-        st.info("🔄 Processing speech...")
-        text = recognizer.recognize_google(audio)
-        return text.lower()
-    except sr.WaitTimeoutError:
-        st.error("No speech detected within timeout")
-        return None
-    except sr.UnknownValueError:
-        st.error("Could not understand the audio")
-        return None
-    except sr.RequestError as e:
-        st.error(f"Could not request results; {e}")
-        return None
-    except Exception as e:
-        st.error(f"Error during speech recognition: {e}")
-        return None
-
-def speak_text(tts_engine, text):
-    """Convert text to speech"""
-    try:
-        tts_engine.say(text)
-        tts_engine.runAndWait()
-    except Exception as e:
-        st.error(f"Error during text-to-speech: {e}")
 
 def main():
     # Header
     st.markdown("""
     <div class="main-header">
-        <h1>🎤 BintaBot - African Voice Assistant</h1>
-        <p><em>Speak with wisdom, learn from tradition</em></p>
+        <h1>🌍 BintaBot - African Cultural Assistant</h1>
+        <p><em>Wisdom from the heart of Africa</em></p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Initialize voice components
-    recognizer, microphone, tts_engine = init_voice()
-    
-    if recognizer and microphone and tts_engine:
-        st.success("✅ Voice system initialized successfully!")
-    else:
-        st.warning("⚠️ Voice features may not work in this environment. Text chat is still available.")
-    
     # Sidebar
-    st.sidebar.header("🎤 Voice Controls")
+    st.sidebar.header("🌍 About BintaBot")
+    st.sidebar.markdown("""
+    BintaBot is a culturally-aware African assistant with deep knowledge of:
     
-    # Voice input button
-    if st.sidebar.button("🎤 Start Voice Input", type="primary", use_container_width=True):
-        if recognizer and microphone:
-            user_input = listen_for_speech(recognizer, microphone)
-            if user_input:
-                st.session_state.voice_input = user_input
-        else:
-            st.error("Voice input not available in this environment")
+    - Ancient African empires (Mali, Ghana, Songhai)
+    - Oral storytelling traditions (Griots)
+    - Community philosophies (Ubuntu)
+    - African proverbs and folk wisdom
+    - Cultural greetings and customs
+    """)
     
-    # Display voice input if available
-    if 'voice_input' in st.session_state:
-        st.text_area("🎤 Voice Input:", value=st.session_state.voice_input, height=100)
+    # Quick commands
+    st.sidebar.markdown("### 💡 Quick Commands:")
+    st.sidebar.markdown("- 'Tell me a story'")
+    st.sidebar.markdown("- 'Share wisdom'")
+    st.sidebar.markdown("- 'How is the family?'")
+    st.sidebar.markdown("- 'Tell me about Ubuntu'")
+    st.sidebar.markdown("- 'What is a griot?'")
+    st.sidebar.markdown("- 'Share an African proverb'")
+    
+    # Clear chat button
+    if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
     
     # Main chat interface
     st.header("💬 Chat with BintaBot")
@@ -149,7 +91,7 @@ def main():
             st.markdown(message["content"])
     
     # Chat input
-    if prompt := st.chat_input("Type your message here..."):
+    if prompt := st.chat_input("Ask BintaBot about African wisdom, stories, or culture..."):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -158,62 +100,30 @@ def main():
         # Get BintaBot response
         with st.chat_message("assistant"):
             with st.spinner("🤔 BintaBot is thinking..."):
-                response = culturally_aware_chat(prompt)
-                st.markdown(response)
-                st.session_state.messages.append({"role": "assistant", "content": response})
-        
-        # Voice response option
-        if tts_engine:
-            col1, col2 = st.columns([1, 4])
-            with col1:
-                if st.button("🔊 Speak Response"):
-                    speak_text(tts_engine, response)
-    
-    # Handle voice input from sidebar
-    if 'voice_input' in st.session_state and st.session_state.voice_input:
-        prompt = st.session_state.voice_input
-        st.session_state.messages.append({"role": "user", "content": f"🎤 {prompt}"})
-        with st.chat_message("user"):
-            st.markdown(f"🎤 {prompt}")
-        
-        # Get BintaBot response
-        with st.chat_message("assistant"):
-            with st.spinner("🤔 BintaBot is thinking..."):
-                response = culturally_aware_chat(prompt)
-                st.markdown(response)
-                st.session_state.messages.append({"role": "assistant", "content": response})
-        
-        # Auto-speak voice responses if TTS is available
-        if tts_engine:
-            speak_text(tts_engine, response)
-        
-        # Clear voice input
-        del st.session_state.voice_input
-    
-    # Clear chat button
-    if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
-        st.session_state.messages = []
-        st.rerun()
-    
-    # Instructions
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### How to use:")
-    st.sidebar.markdown("1. **Voice Input**: Click the voice button and speak")
-    st.sidebar.markdown("2. **Text Input**: Type in the chat box")
-    st.sidebar.markdown("3. **Voice Response**: Click 🔊 to hear responses")
-    st.sidebar.markdown("4. **Clear Chat**: Remove all conversation history")
+                try:
+                    response = culturally_aware_chat(prompt)
+                    st.markdown(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                except Exception as e:
+                    error_msg = f"I apologize, but I encountered an error while processing your request. Please try again with a different question about African culture, wisdom, or traditions."
+                    st.error(error_msg)
+                    st.session_state.messages.append({"role": "assistant", "content": error_msg})
     
     # Footer
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### About BintaBot")
-    st.sidebar.markdown("BintaBot is a culturally-aware African assistant with deep knowledge of African traditions, proverbs, and wisdom.")
+    st.sidebar.markdown("### 🌟 Features")
+    st.sidebar.markdown("""
+    - **Cultural Wisdom**: Learn from African traditions
+    - **Proverbs**: Discover ancient wisdom
+    - **Stories**: Hear African folktales
+    - **History**: Explore African empires
+    - **Philosophy**: Understand Ubuntu and more
+    """)
     
-    # Quick commands
-    st.sidebar.markdown("### Quick Commands:")
-    st.sidebar.markdown("- 'Tell me a story'")
-    st.sidebar.markdown("- 'Share wisdom'")
-    st.sidebar.markdown("- 'How is the family?'")
-    st.sidebar.markdown("- 'Tell me about Ubuntu'")
+    # Note about voice features
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 📝 Note")
+    st.sidebar.markdown("Voice features are available in the local version. This cloud version focuses on text-based cultural exchange.")
 
 if __name__ == "__main__":
     main() 

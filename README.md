@@ -1,15 +1,14 @@
-# 🎤 BintaBot - African Voice Assistant
+# 🌍 BintaBot - African Cultural Assistant
 
-A culturally-aware African chatbot with voice capabilities, built with wisdom and tradition.
+A culturally-aware African chatbot with deep knowledge of African traditions, proverbs, and wisdom.
 
 ## 🌟 Features
 
-- **Voice Input**: Speak to BintaBot using your microphone
-- **Voice Output**: Hear BintaBot's responses spoken aloud
-- **Text Chat**: Traditional text-based conversation
 - **Cultural Wisdom**: Responses grounded in African traditions, proverbs, and values
+- **Text Chat**: Rich conversation about African culture and history
 - **Multiple Interfaces**: Command-line, Streamlit UI, and FastAPI endpoints
 - **Cloud Deployment**: Ready for Streamlit Cloud deployment
+- **Local Voice Features**: Voice input/output available in local development
 
 ## 🚀 Quick Start - Streamlit Cloud
 
@@ -23,9 +22,11 @@ A culturally-aware African chatbot with voice capabilities, built with wisdom an
 6. **Set the main file path**: `streamlit_app.py`
 7. **Click "Deploy"**
 
-Your BintaBot will be live in minutes! 🎉
+Your BintaBot will be live in minutes! 🌍
 
-### Local Development
+**Note**: The cloud version focuses on text-based cultural exchange. Voice features are available in the local version.
+
+### Local Development (Full Features)
 
 1. **Clone and setup environment:**
 ```bash
@@ -50,13 +51,15 @@ brew install cmake
 
 ## 🛠️ Usage
 
-### 1. Streamlit Cloud (Recommended)
+### 1. Streamlit Cloud (Text Only)
 - Visit your deployed app URL
-- Use voice input button in sidebar
 - Type messages in chat box
-- Click 🔊 to hear responses
+- Ask about African wisdom, stories, or culture
+- Perfect for sharing cultural knowledge
 
-### 2. Voice Chat (Command Line)
+### 2. Local Development (Full Features)
+
+#### Voice Chat (Command Line)
 ```bash
 python voice_chatbot.py
 ```
@@ -64,7 +67,7 @@ python voice_chatbot.py
 - Voice responses are automatic
 - Simple and intuitive interface
 
-### 3. Streamlit Voice UI (Local)
+#### Streamlit Voice UI (Local)
 ```bash
 streamlit run voice_ui.py
 ```
@@ -73,7 +76,7 @@ streamlit run voice_ui.py
 - Chat history with voice response options
 - Real-time speech recognition
 
-### 4. FastAPI Backend
+#### FastAPI Backend
 ```bash
 uvicorn api:app --reload
 ```
@@ -82,14 +85,14 @@ uvicorn api:app --reload
 - Speech-to-text endpoint: `/voice/speech-to-text`
 - Text chat endpoint: `/chat`
 
-### 5. Simple Text UI
+#### Simple Text UI
 ```bash
 streamlit run chatbot_ui.py
 ```
 - Basic text-only interface
 - No voice capabilities
 
-## 🎤 Voice Features
+## 🎤 Voice Features (Local Only)
 
 ### Speech Recognition
 - Uses Google's speech recognition API
@@ -107,21 +110,21 @@ streamlit run chatbot_ui.py
 
 ```
 fatoubot/
-├── streamlit_app.py      # Main app for Streamlit Cloud deployment
+├── streamlit_app.py      # Main app for Streamlit Cloud deployment (text-only)
 ├── model.py              # Mistral-7B model loading
 ├── chatbot.py            # Core chat logic with BintaBot prompt
-├── voice_utils.py        # Voice recognition and TTS utilities
-├── voice_chatbot.py      # Command-line voice interface
-├── voice_ui.py           # Streamlit voice interface
+├── voice_utils.py        # Voice recognition and TTS utilities (local)
+├── voice_chatbot.py      # Command-line voice interface (local)
+├── voice_ui.py           # Streamlit voice interface (local)
 ├── chatbot_ui.py         # Basic text interface
-├── api.py                # FastAPI backend with voice endpoints
+├── api.py                # FastAPI backend with voice endpoints (local)
 ├── requirements.txt      # Python dependencies
 ├── .streamlit/           # Streamlit configuration
 │   └── config.toml
 └── README.md            # This file
 ```
 
-## 🔧 API Endpoints
+## 🔧 API Endpoints (Local)
 
 ### Text Chat
 ```bash
@@ -146,13 +149,14 @@ POST /voice/speech-to-text
 # Upload audio file (WAV format)
 ```
 
-## 🎯 Voice Commands
+## 🎯 Quick Commands
 
-- **"Goodbye"** or **"Exit"** or **"Quit"** - End the conversation
-- **"How is the family?"** - Cultural greeting
-- **"You are invited"** - Cultural invitation response
 - **"Tell me a story"** - Request African folktale
 - **"Share wisdom"** - Request African proverb
+- **"How is the family?"** - Cultural greeting
+- **"Tell me about Ubuntu"** - Learn about African philosophy
+- **"What is a griot?"** - Learn about oral tradition
+- **"Share an African proverb"** - Get wisdom from ancestors
 
 ## 🌍 Cultural Context
 
@@ -166,14 +170,16 @@ BintaBot is designed with deep knowledge of:
 ## 🐛 Troubleshooting
 
 ### Streamlit Cloud Issues
-- Voice features may be limited in cloud environment
+- Voice features are not available in cloud environment
 - Text chat will always work
 - Check deployment logs for errors
+- Ensure all dependencies are properly specified
 
-### Microphone Issues
+### Local Voice Issues
 - Ensure microphone permissions are granted
 - Check if microphone is connected and working
 - Try different microphone if available
+- Install system dependencies (portaudio, cmake)
 
 ### Speech Recognition Errors
 - Speak clearly and at normal volume
