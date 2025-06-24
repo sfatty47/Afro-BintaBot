@@ -38,6 +38,21 @@ fallback_responses = {
         "A griot is more than a storyteller - they are the guardians of our history, culture, and wisdom. They use music, poetry, and narrative to preserve our heritage.",
         "Griots are the cultural memory of African societies. They carry the stories of kings, warriors, and everyday people, ensuring that our traditions live on."
     ],
+    "sundiata": [
+        "Sundiata Keita was the legendary founder of the Mali Empire in the 13th century. Known as the 'Lion King,' he united the Mandinka people and established one of Africa's greatest empires. His story teaches us about leadership, unity, and the power of determination.",
+        "Sundiata Keita, the founder of the Mali Empire, was a remarkable leader who overcame physical challenges to become one of Africa's greatest kings. His empire controlled the gold and salt trade routes, making Mali one of the wealthiest kingdoms of its time.",
+        "The story of Sundiata Keita is one of resilience and leadership. Despite being born with a disability, he became the founder of the Mali Empire, proving that true strength comes from character and determination, not physical ability."
+    ],
+    "mali_empire": [
+        "The Mali Empire was one of the greatest African empires, flourishing from the 13th to 16th centuries. It was known for its wealth, particularly in gold, and its famous ruler Mansa Musa, who made a legendary pilgrimage to Mecca.",
+        "The Mali Empire, centered in West Africa, was a beacon of learning and culture. Its capital, Timbuktu, became a center of Islamic scholarship and trade, attracting scholars from across the Muslim world.",
+        "The Mali Empire represents the height of African civilization, with its sophisticated government, extensive trade networks, and rich cultural traditions. It shows what African societies can achieve when united under strong leadership."
+    ],
+    "mansa_musa": [
+        "Mansa Musa was the most famous ruler of the Mali Empire, known for his legendary pilgrimage to Mecca in 1324. His journey with thousands of followers and vast amounts of gold demonstrated the empire's wealth and power.",
+        "Mansa Musa's pilgrimage to Mecca was so extravagant that it affected the gold market in Egypt and the Mediterranean. His generosity and the wealth he displayed showed the world the sophistication of African kingdoms.",
+        "Mansa Musa was not just wealthy; he was a wise ruler who invested in education and culture. He built mosques and schools, making Timbuktu a center of learning that attracted scholars from across the Islamic world."
+    ],
     "default": [
         "I am BintaBot, your African cultural assistant. I'm here to share the wisdom, stories, and traditions of Africa with you.",
         "Greetings! I'm here to help you learn about African culture, history, and wisdom. What would you like to know?",
@@ -59,6 +74,12 @@ def get_fallback_response(user_input):
         return fallback_responses["ubuntu"][0]
     elif "griot" in user_input_lower:
         return fallback_responses["griot"][0]
+    elif "sundiata" in user_input_lower:
+        return fallback_responses["sundiata"][0]
+    elif "mali" in user_input_lower and "empire" in user_input_lower:
+        return fallback_responses["mali_empire"][0]
+    elif "mansa musa" in user_input_lower:
+        return fallback_responses["mansa_musa"][0]
     else:
         return fallback_responses["default"][0]
 

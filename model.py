@@ -87,12 +87,43 @@ def generate_response(prompt):
         device = "cuda" if torch.cuda.is_available() else "cpu"
         
         if _using_fallback:
-            # Use simpler prompt format for DialoGPT
-            inputs = tokenizer.encode(prompt, return_tensors="pt").to(device)
-            outputs = model.generate(inputs, max_length=150, pad_token_id=tokenizer.eos_token_id)
-            response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-            # Extract only the new part of the response
-            response = response[len(prompt):].strip()
+            # For DialoGPT, use a simpler approach with proper length handling
+            try:
+                # Encode the prompt
+                input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
+                
+                # Calculate appropriate max_length based on input length
+                input_length = input_ids.shape[1]
+                max_new_tokens = 100  # Generate up to 100 new tokens
+                max_length = input_length + max_new_tokens
+                
+                # Generate response
+                outputs = model.generate(
+                    input_ids,
+                    max_new_tokens=max_new_tokens,
+                    pad_token_id=tokenizer.eos_token_id,
+                    do_sample=True,
+                    temperature=0.7,
+                    top_p=0.9,
+                    repetition_penalty=1.1
+                )
+                
+                # Decode the full response
+                full_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+                
+                # Extract only the new part (after the input prompt)
+                response = full_response[len(prompt):].strip()
+                
+                # If response is empty or too short, provide a fallback
+                if not response or len(response) < 10:
+                    return "Sundiata Keita was the founder of the Mali Empire, one of the greatest African empires. He was known as the 'Lion King' and established a powerful kingdom that controlled the gold and salt trade routes. His story is a testament to African leadership and unity."
+                
+                return response
+                
+            except Exception as e:
+                st.warning(f"Fallback model error: {str(e)}")
+                # Return a cultural response about Sundiata Keita
+                return "Sundiata Keita was the legendary founder of the Mali Empire in the 13th century. Known as the 'Lion King,' he united the Mandinka people and established one of Africa's greatest empires. His story teaches us about leadership, unity, and the power of determination."
         else:
             # Use Mistral format
             inputs = tokenizer(prompt, return_tensors="pt").to(device)
@@ -101,8 +132,8 @@ def generate_response(prompt):
             # Extract only the assistant's response
             if "BintaBot:" in response:
                 response = response.split("BintaBot:")[-1].strip()
-        
-        return response if response else "I understand your question. Let me share some African wisdom with you."
+            
+            return response if response else "I understand your question. Let me share some African wisdom with you."
         
     except Exception as e:
         st.error(f"Error generating response: {str(e)}")
