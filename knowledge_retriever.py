@@ -190,27 +190,72 @@ def enhance_query_for_africa(query):
         return f"Africa African {query}"
 
 def format_knowledge_response(knowledge_data):
-    """Format knowledge data into a readable response"""
+    """Format knowledge data into a readable response with reduced duplication"""
     if not knowledge_data:
         return None
-        
+    
     response_parts = []
     
-    # Add Wikipedia information
+    # Add Wikipedia content if available
     if knowledge_data.get('wikipedia'):
-        wiki = knowledge_data['wikipedia']
-        response_parts.append(f"📚 **{wiki['title']}** (from Wikipedia)")
-        response_parts.append(wiki['summary'])
-        response_parts.append(f"Learn more: {wiki['url']}")
+        wiki_content = knowledge_data['wikipedia']
+        if isinstance(wiki_content, str) and len(wiki_content) > 50:
+            # Clean and summarize Wikipedia content
+            cleaned_wiki = clean_content(wiki_content)
+            if cleaned_wiki:
+                response_parts.append(f"**From our shared knowledge:** {cleaned_wiki}")
     
-    # Add web search results
+    # Add web results if available (avoid duplicates with Wikipedia)
     if knowledge_data.get('web_results'):
-        response_parts.append("\n🌐 **Additional Information:**")
-        for i, result in enumerate(knowledge_data['web_results'][:2], 1):
-            response_parts.append(f"{i}. **{result['title']}**")
-            response_parts.append(f"   {result['snippet'][:200]}...")
+        web_results = knowledge_data['web_results']
+        if isinstance(web_results, list) and web_results:
+            # Take only the first 2 web results to avoid overwhelming
+            for i, result in enumerate(web_results[:2]):
+                if isinstance(result, dict):
+                    title = result.get('title', '')
+                    snippet = result.get('snippet', '')
+                    
+                    # Clean the snippet
+                    cleaned_snippet = clean_content(snippet)
+                    if cleaned_snippet and not is_duplicate_content(cleaned_snippet, response_parts):
+                        response_parts.append(f"**Additional insight:** {cleaned_snippet}")
     
-    return "\n\n".join(response_parts)
+    if response_parts:
+        return " ".join(response_parts)
+    
+    return None
+
+def clean_content(content):
+    """Clean and summarize content to reduce length and repetition"""
+    if not content:
+        return ""
+    
+    # Remove extra whitespace
+    content = re.sub(r'\s+', ' ', content.strip())
+    
+    # Limit length to avoid overwhelming responses
+    if len(content) > 300:
+        # Try to find a good breaking point
+        sentences = re.split(r'(?<=[.!?]) +', content)
+        if len(sentences) > 2:
+            content = " ".join(sentences[:2]) + "."
+    
+    return content
+
+def is_duplicate_content(new_content, existing_parts):
+    """Check if new content is too similar to existing parts"""
+    if not existing_parts:
+        return False
+    
+    new_words = set(new_content.lower().split())
+    
+    for part in existing_parts:
+        existing_words = set(part.lower().split())
+        # If more than 50% of words overlap, consider it duplicate
+        if len(new_words.intersection(existing_words)) / len(new_words) > 0.5:
+            return True
+    
+    return False
 
 # African knowledge sources
 AFRICAN_KNOWLEDGE_SOURCES = {

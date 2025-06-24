@@ -2,16 +2,34 @@ from model import generate_response, get_cultural_response
 from rag_system import get_rag_response
 import streamlit as st
 import time
+import re
 
-system_prompt = """
-You are BintaBot, a wise and culturally-grounded African assistant.
+# System prompt with anti-repetition instructions
+SYSTEM_PROMPT = """You are BintaBot, a wise African cultural assistant with deep knowledge of African history, culture, traditions, and wisdom. You speak with the warmth and wisdom of an African elder, sharing knowledge with love and respect.
 
-You possess deep knowledge of Africa's ancient history, traditions, proverbs, and moral values passed down through generations. You understand the rich diversity of African cultures—from the empires of Mali, Ghana, and Songhai, to the oral storytelling traditions of the griots, and the community-centered philosophies like Ubuntu.
+**Core Instructions:**
+- Avoid repeating phrases or facts in a single response
+- Present answers clearly, concisely, and warmly — like an elder teaching the next generation
+- Provide culturally rich and warm explanations with no duplication
+- If you've already mentioned something in the current response, don't repeat it
+- Use diverse vocabulary and sentence structures
+- Connect information in a flowing, natural way
 
-You speak with clarity, respect, and warmth. When appropriate, use African proverbs, folk wisdom, or historical examples to explain ideas or provide guidance. You recognize and respond appropriately to culturally significant greetings such as "How is the family?" or "You are invited."
+**Cultural Approach:**
+- Begin responses with warm African greetings when appropriate
+- Share wisdom through proverbs and traditional sayings
+- Emphasize the interconnectedness of African cultures
+- Highlight the resilience and strength of African people
+- Encourage learning and curiosity about African heritage
 
-Always reply in clear, simple English, using culturally relevant analogies when helpful. Be kind, grounded, and wise, like an elder speaking to younger generations.
-"""
+**Response Style:**
+- Be informative yet warm and engaging
+- Use storytelling elements when sharing historical information
+- Include relevant cultural context and significance
+- End with encouraging follow-up questions to continue learning
+- Maintain the voice of a wise African elder throughout
+
+Remember: You are not just sharing information, but passing down wisdom from one generation to the next. Make each response meaningful, accurate, and culturally authentic."""
 
 # Fallback responses for when the model is not available
 fallback_responses = {
@@ -136,12 +154,12 @@ BintaBot:"""
         )
         
         if rag_is_relevant:
-            response = rag_response
+            response = clean_response(rag_response)
         else:
             # Try specific fallback responses for common topics
             fallback_response = get_african_fallback_response(user_input)
             if fallback_response:
-                response = fallback_response
+                response = clean_response(fallback_response)
             else:
                 # Try knowledge retrieval system for online information
                 try:
@@ -161,16 +179,17 @@ BintaBot:"""
 As our elders say, 'Knowledge is like a garden: if it is not cultivated, it cannot be harvested.' Let us continue to learn and grow together.
 
 Would you like to explore more about this topic or learn about related aspects of African culture?"""
+                            response = clean_response(response)
                         else:
                             # Fall back to model generation
-                            response = generate_response(final_prompt)
+                            response = clean_response(generate_response(final_prompt))
                     else:
                         # Fall back to model generation
-                        response = generate_response(final_prompt)
+                        response = clean_response(generate_response(final_prompt))
                     
                 except ImportError:
                     # Knowledge retrieval not available, fall back to model generation
-                    response = generate_response(final_prompt)
+                    response = clean_response(generate_response(final_prompt))
         
         # Post-process to ensure cultural warmth
         if response and not response.startswith("I am BintaBot"):
@@ -426,4 +445,75 @@ As our elders say, 'The past is a guide to the future.' Understanding our histor
 
 Would you like to learn about specific periods, empires, or historical figures?"""
 
-    return None 
+    return None
+
+def clean_response(response):
+    """
+    Clean response by removing duplicate sentences and improving flow
+    """
+    if not response:
+        return response
+    
+    # Split into sentences while preserving punctuation
+    sentences = re.split(r'(?<=[.!?]) +', response.strip())
+    
+    # Remove exact duplicates while preserving order
+    seen = set()
+    unique_sentences = []
+    
+    for sentence in sentences:
+        sentence_clean = sentence.strip()
+        if sentence_clean and sentence_clean.lower() not in seen:
+            seen.add(sentence_clean.lower())
+            unique_sentences.append(sentence_clean)
+    
+    # Join sentences back together
+    cleaned_response = " ".join(unique_sentences)
+    
+    # Fix any double spaces or formatting issues
+    cleaned_response = re.sub(r'\s+', ' ', cleaned_response)
+    
+    return cleaned_response.strip()
+
+def format_chat_history_for_context(chat_history, max_messages=4):
+    """
+    Format recent chat history for context to prevent repetition
+    """
+    if not chat_history or len(chat_history) < 2:
+        return ""
+    
+    # Get the last few exchanges
+    recent_history = chat_history[-max_messages:]
+    
+    context_parts = []
+    for i in range(0, len(recent_history), 2):
+        if i + 1 < len(recent_history):
+            user_msg = recent_history[i]
+            bot_msg = recent_history[i + 1]
+            context_parts.append(f"User: {user_msg}\nAssistant: {bot_msg[:100]}...")
+    
+    if context_parts:
+        return "\n\nRecent conversation:\n" + "\n".join(context_parts) + "\n\n"
+    
+    return ""
+
+def generate_response(prompt):
+    """Generate response using the loaded model"""
+    try:
+        # Add context from recent chat history to prevent repetition
+        chat_context = format_chat_history_for_context(st.session_state.chat_history)
+        
+        # Create enhanced prompt with context
+        enhanced_prompt = f"{SYSTEM_PROMPT}\n\n{chat_context}Current question: {prompt}\n\nPlease avoid repeating information. Provide a culturally rich and warm explanation with no duplication."
+        
+        # Generate response
+        response = model.generate(enhanced_prompt, max_length=512, temperature=0.7, do_sample=True)
+        
+        # Clean the response to remove duplicates
+        cleaned_response = clean_response(response)
+        
+        return cleaned_response
+        
+    except Exception as e:
+        st.error(f"Error generating response: {str(e)}")
+        return "I apologize, but I'm having trouble generating a response right now. Please try again." 

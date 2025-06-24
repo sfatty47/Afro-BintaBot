@@ -3,6 +3,8 @@ from typing import List, Dict, Tuple
 import re
 from model import CULTURAL_KNOWLEDGE, FALLBACK_RESPONSES
 import random
+from langchain.vectorstores import VectorStore
+from langchain.retrievers import MultiModalRetriever
 
 class AfricanRAGSystem:
     """
@@ -258,57 +260,67 @@ class AfricanRAGSystem:
     
     def search_knowledge(self, query: str, top_k: int = 3) -> List[Dict]:
         """
-        Search for relevant knowledge chunks based on query
+        Search knowledge chunks with improved diversity to reduce duplication
         """
         query_lower = query.lower()
-        query_words = set(re.findall(r'\w+', query_lower))
-        
         scored_chunks = []
         
         for chunk in self.knowledge_chunks:
             score = 0
             
-            # Exact name matching (highest priority)
-            if chunk["category"] == "historical_figure":
-                figure_name = chunk["keywords"][0]  # First keyword is the name
-                if figure_name in query_lower:
-                    score += 10  # Very high score for exact name match
-            
-            # Specific query matching (high priority)
-            if "tribes in senegal" in query_lower or "senegalese tribes" in query_lower:
-                if "senegal" in chunk["keywords"] or "tribe" in chunk["keywords"]:
-                    score += 8
-            elif "languages in gambia" in query_lower or "gambian languages" in query_lower:
-                if "gambia" in chunk["keywords"] or "language" in chunk["keywords"]:
-                    score += 8
-            elif "kunta kinteh" in query_lower or "kunta" in query_lower:
-                if "kunta" in chunk["keywords"]:
-                    score += 10
-            
-            # Keyword matching
+            # Check for exact keyword matches
             for keyword in chunk["keywords"]:
-                if keyword.lower() in query_lower:
-                    score += 2
-            
-            # Word overlap
-            chunk_words = set(re.findall(r'\w+', chunk["content"].lower()))
-            overlap = len(query_words.intersection(chunk_words))
-            score += overlap
-            
-            # Topic matching
-            if chunk["topic"] in query_lower:
-                score += 3
-            
-            # Category matching
-            if chunk["category"] in query_lower:
+                if keyword in query_lower:
+                    score += 3
+                    
+            # Check for partial matches
+            for keyword in chunk["keywords"]:
+                if any(word in query_lower for word in keyword.split()):
+                    score += 1
+                    
+            # Check content relevance
+            content_lower = chunk["content"].lower()
+            if any(word in content_lower for word in query_lower.split()):
                 score += 2
-            
+                
+            # Boost score for exact name matches
+            if any(word in query_lower for word in chunk["content"].split()[:3]):
+                score += 5
+                
             if score > 0:
                 scored_chunks.append((score, chunk))
         
-        # Sort by score and return top_k results
+        # Sort by score and get top results
         scored_chunks.sort(key=lambda x: x[0], reverse=True)
-        return [chunk for score, chunk in scored_chunks[:top_k]]
+        
+        # Apply diversity filtering to reduce similar chunks
+        diverse_chunks = []
+        seen_topics = set()
+        seen_categories = set()
+        
+        for score, chunk in scored_chunks[:top_k * 2]:  # Get more candidates for diversity
+            # Prefer chunks from different topics and categories
+            topic_key = chunk["topic"]
+            category = chunk["category"]
+            
+            # If we haven't seen this topic/category combination, add it
+            if (topic_key, category) not in seen_topics:
+                diverse_chunks.append(chunk)
+                seen_topics.add((topic_key, category))
+                
+                # Limit to requested number
+                if len(diverse_chunks) >= top_k:
+                    break
+        
+        # If we don't have enough diverse chunks, add some more
+        if len(diverse_chunks) < top_k:
+            for score, chunk in scored_chunks:
+                if chunk not in diverse_chunks:
+                    diverse_chunks.append(chunk)
+                    if len(diverse_chunks) >= top_k:
+                        break
+        
+        return diverse_chunks[:top_k]
     
     def generate_rag_response(self, query: str, chat_history: List[Dict] = None) -> str:
         """
@@ -568,8 +580,22 @@ Would you like to learn more about the daily life in {country_info['name']}, the
 # Global RAG system instance
 rag_system = AfricanRAGSystem()
 
-def get_rag_response(query: str, chat_history: List[Dict] = None) -> str:
+def get_rag_response(query, chat_history=None):
     """
-    Get response using the RAG system
+    Get response from RAG system with improved diversity to reduce duplication
     """
-    return rag_system.generate_rag_response(query, chat_history) 
+    try:
+        # Use the existing RAG system
+        response = rag_system.generate_rag_response(query, chat_history)
+        
+        if response:
+            # Clean the response to remove any duplicates
+            from chatbot import clean_response
+            cleaned_response = clean_response(response)
+            return cleaned_response
+        
+        return None
+        
+    except Exception as e:
+        st.error(f"RAG system error: {str(e)}")
+        return None 
