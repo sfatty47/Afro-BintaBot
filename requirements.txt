@@ -1,0 +1,8 @@
+torch
+transformers
+fastapi
+uvicorn
+streamlit
+speechrecognition
+pyttsx3
+pyaudio 
