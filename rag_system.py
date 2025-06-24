@@ -3,8 +3,6 @@ from typing import List, Dict, Tuple
 import re
 from model import CULTURAL_KNOWLEDGE, FALLBACK_RESPONSES
 import random
-from langchain.vectorstores import VectorStore
-from langchain.retrievers import MultiModalRetriever
 
 class AfricanRAGSystem:
     """
