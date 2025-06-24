@@ -40,6 +40,38 @@ class AfricanRAGSystem:
                     "keywords": [figure_info['name'].lower(), figure_key, "legacy", "impact", "influence"]
                 }
             ])
+            
+            # Add story if it exists
+            if 'story' in figure_info:
+                chunks.append({
+                    "content": f"{figure_info['name']} story: {figure_info['story']}",
+                    "topic": figure_key,
+                    "category": "historical_figure",
+                    "keywords": [figure_info['name'].lower(), figure_key, "story", "history"]
+                })
+        
+        # Country chunks
+        for country_key, country_info in CULTURAL_KNOWLEDGE["countries"].items():
+            chunks.extend([
+                {
+                    "content": f"{country_info['name']} tribes: {', '.join(country_info['tribes'])}",
+                    "topic": country_key,
+                    "category": "country",
+                    "keywords": [country_key, "tribes", "ethnic groups", "people"]
+                },
+                {
+                    "content": f"{country_info['name']} languages: {', '.join(country_info['languages'])}",
+                    "topic": country_key,
+                    "category": "country",
+                    "keywords": [country_key, "languages", "linguistic"]
+                },
+                {
+                    "content": f"{country_info['name']} culture: {country_info['culture']}",
+                    "topic": country_key,
+                    "category": "country",
+                    "keywords": [country_key, "culture", "traditions"]
+                }
+            ])
         
         # Ubuntu chunks
         ubuntu_info = CULTURAL_KNOWLEDGE["ubuntu"]
@@ -229,6 +261,17 @@ class AfricanRAGSystem:
                 if figure_name in query_lower:
                     score += 10  # Very high score for exact name match
             
+            # Specific query matching (high priority)
+            if "tribes in senegal" in query_lower or "senegalese tribes" in query_lower:
+                if "senegal" in chunk["keywords"] or "tribe" in chunk["keywords"]:
+                    score += 8
+            elif "languages in gambia" in query_lower or "gambian languages" in query_lower:
+                if "gambia" in chunk["keywords"] or "language" in chunk["keywords"]:
+                    score += 8
+            elif "kunta kinteh" in query_lower or "kunta" in query_lower:
+                if "kunta" in chunk["keywords"]:
+                    score += 10
+            
             # Keyword matching
             for keyword in chunk["keywords"]:
                 if keyword.lower() in query_lower:
@@ -290,6 +333,10 @@ class AfricanRAGSystem:
         # Check for ethnic groups
         if main_topic in CULTURAL_KNOWLEDGE["ethnic_groups"]:
             return self._generate_ethnic_group_response(query, context, chunks, main_topic)
+        
+        # Check for countries
+        if main_topic in CULTURAL_KNOWLEDGE["countries"]:
+            return self._generate_country_response(query, context, chunks, main_topic)
         
         # Generate appropriate response based on topic
         if main_topic == "ubuntu":
@@ -480,6 +527,20 @@ The **{group_info['name']}** are one of Africa's most significant ethnic groups,
 The {group_info['name']} have preserved their rich cultural heritage through generations, maintaining their traditions while adapting to modern times. Their emphasis on community, respect for elders, and preservation of cultural practices makes them a shining example of African cultural resilience.
 
 Would you like to learn more about {group_info['name']} music and instruments, their traditional ceremonies, or their cultural values?"""
+    
+    def _generate_country_response(self, query: str, context: str, chunks: List[Dict], country_key: str) -> str:
+        """Generate specific response for countries"""
+        country_info = CULTURAL_KNOWLEDGE["countries"][country_key]
+        
+        return f"""Ah, the {country_info['name']}! Let me share with you the rich culture and traditions of this remarkable country...
+
+{context}
+
+{country_info['name']} is home to {', '.join(country_info['tribes'])} tribes, and their languages include {', '.join(country_info['languages'])} languages.
+
+{country_info['culture']}
+
+Would you like to learn more about the daily life in {country_info['name']}, their cultural practices, or their history?"""
     
     def _get_fallback_response(self, query: str) -> str:
         """Get fallback response when no relevant chunks are found"""

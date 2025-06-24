@@ -98,6 +98,15 @@ CULTURAL_KNOWLEDGE = {
             ],
             "legacy": "Mansa Musa is considered one of the wealthiest people in history. His pilgrimage to Mecca in 1324 brought Mali to the attention of the world and established its reputation as a land of great wealth and learning.",
             "story": "Mansa Musa's famous pilgrimage included 60,000 people, 12,000 slaves, and so much gold that he gave it away freely, causing the price of gold to drop in the regions he visited."
+        },
+        "kunta_kinteh": {
+            "name": "Kunta Kinteh",
+            "title": "Historical figure from The Gambia",
+            "period": "18th century",
+            "story": "Kunta Kinteh was a young Mandinka man from The Gambia who was captured and enslaved in the 18th century. His story was popularized by Alex Haley's novel 'Roots' and the subsequent TV series. According to the story, Kunta was born in Juffure, a village in The Gambia, and was captured by slave traders while searching for wood to make a drum. He was taken to America where he maintained his cultural identity and passed down his African heritage to his descendants.",
+            "significance": "Kunta Kinteh's story represents the resilience of African people during the transatlantic slave trade and the importance of preserving cultural identity. His story has inspired millions to trace their African roots.",
+            "legacy": "Kunta Kinteh's legacy lives on through the Kunta Kinteh Island (formerly James Island) in The Gambia, which is now a UNESCO World Heritage site. His story continues to educate people about the horrors of slavery and the strength of African heritage.",
+            "cultural_impact": "The story of Kunta Kinteh has become a symbol of African resistance and cultural preservation. It has inspired genealogical research and cultural reconnection for many African Americans."
         }
     },
     "proverbs": {
@@ -323,6 +332,52 @@ CULTURAL_KNOWLEDGE = {
                 "Amadou Hampâté Bâ - Famous writer and ethnologist"
             ]
         }
+    },
+    "countries": {
+        "senegal": {
+            "name": "Senegal",
+            "tribes": [
+                "Wolof - Largest ethnic group, known for their language and culture",
+                "Fula (Fulani) - Semi-nomadic pastoralists, cattle herders",
+                "Serer - Traditional farmers and fishermen",
+                "Mandinka - Descendants of the Mali Empire",
+                "Diola - Rice farmers from the Casamance region",
+                "Tukulor - Islamic scholars and traders",
+                "Lebou - Traditional fishermen from the coast",
+                "Bambara - Farmers and traders"
+            ],
+            "languages": [
+                "French (official language)",
+                "Wolof (most widely spoken)",
+                "Fula (Fulani)",
+                "Serer",
+                "Mandinka",
+                "Diola",
+                "Arabic (religious language)"
+            ],
+            "culture": "Senegal is known for its rich cultural diversity, traditional music (Mbalax), wrestling (Laamb), and hospitality (Teranga)."
+        },
+        "gambia": {
+            "name": "The Gambia",
+            "tribes": [
+                "Mandinka - Largest ethnic group, descendants of Mali Empire",
+                "Fula (Fulani) - Cattle herders and traders",
+                "Wolof - From Senegal, traders and farmers",
+                "Jola - Rice farmers from the south",
+                "Serahuli - Traders and merchants",
+                "Aku - Descendants of freed slaves"
+            ],
+            "languages": [
+                "English (official language)",
+                "Mandinka (most widely spoken)",
+                "Fula (Fulani)",
+                "Wolof",
+                "Jola",
+                "Serahuli",
+                "Arabic (religious language)"
+            ],
+            "culture": "The Gambia is known for its peaceful nature, traditional music, and the famous Kunta Kinteh Island (formerly James Island)."
+        }
     }
 }
 
@@ -474,6 +529,62 @@ Mansa Musa was the **{figure_info['title']}** during {figure_info['period']}.
 Mansa Musa's story teaches us about the wealth and sophistication of African empires, the importance of education and learning, and the power of cultural exchange.
 
 Would you like to learn more about the Mali Empire at its peak or the University of Timbuktu that Mansa Musa built?"""
+
+    elif any(word in input_lower for word in ["kunta kinteh", "kunta"]):
+        figure_info = CULTURAL_KNOWLEDGE["historical_figures"]["kunta_kinteh"]
+        return f"""Ah, Kunta Kinteh! Let me share with you the powerful story of this remarkable figure from The Gambia...
+
+Kunta Kinteh was a **{figure_info['title']}** during the {figure_info['period']}. 
+
+**His Story:**
+{figure_info['story']}
+
+**Significance:**
+{figure_info['significance']}
+
+**Legacy:**
+{figure_info['legacy']}
+
+**Cultural Impact:**
+{figure_info['cultural_impact']}
+
+Kunta Kinteh's story teaches us about resilience, cultural preservation, and the strength of African heritage. His legacy continues to inspire people around the world to connect with their African roots.
+
+Would you like to learn more about The Gambia's history or the transatlantic slave trade?"""
+
+    # Check for specific country queries
+    elif any(word in input_lower for word in ["tribes in senegal", "senegalese tribes", "senegal tribes"]):
+        country_info = CULTURAL_KNOWLEDGE["countries"]["senegal"]
+        return f"""Ah, the tribes of Senegal! Let me share with you the rich ethnic diversity of this beautiful country...
+
+**Major Tribes in Senegal:**
+
+{chr(10).join([f"• {tribe}" for tribe in country_info['tribes']])}
+
+**Languages Spoken:**
+{', '.join(country_info['languages'])}
+
+**Cultural Heritage:**
+{country_info['culture']}
+
+Senegal's ethnic diversity is a testament to the rich cultural tapestry of West Africa. Each tribe brings its unique traditions, languages, and customs, creating a vibrant and harmonious society.
+
+Would you like to learn more about any specific Senegalese tribe or their traditional customs?"""
+
+    elif any(word in input_lower for word in ["languages in gambia", "gambian languages", "gambia languages"]):
+        country_info = CULTURAL_KNOWLEDGE["countries"]["gambia"]
+        return f"""Ah, the languages of The Gambia! Let me share with you the linguistic diversity of this peaceful country...
+
+**Languages Spoken in The Gambia:**
+
+{chr(10).join([f"• {language}" for language in country_info['languages']])}
+
+**Cultural Heritage:**
+{country_info['culture']}
+
+The Gambia's linguistic diversity reflects its rich cultural heritage and the peaceful coexistence of different ethnic groups. Mandinka is the most widely spoken language, but each language carries the wisdom and traditions of its people.
+
+Would you like to learn some basic phrases in any of these languages or explore Gambian culture further?"""
 
     # Check for specific topics and provide detailed responses
     elif any(word in input_lower for word in ["ubuntu", "philosophy", "community"]):
@@ -679,6 +790,24 @@ The **{tribe_info['name']}** are one of the largest ethnic groups in West Africa
 The Fula people have preserved their rich cultural heritage through generations, maintaining their traditions while adapting to modern times. Their emphasis on community, respect for elders, and preservation of oral history through griots makes them a shining example of African cultural resilience.
 
 Would you like to learn more about Fula music and instruments, their traditional ceremonies, or the role of griots in their society?"""
+
+    # Check for countries
+    elif any(word in input_lower for word in ["senegal", "gambia"]):
+        country_info = CULTURAL_KNOWLEDGE["countries"][word]
+        return f"""Ah, the {country_info['name']}! Let me share with you the rich cultural heritage and traditions of this African country...
+
+**Tribes:**
+{', '.join(country_info['tribes'])}
+
+**Languages:**
+{', '.join(country_info['languages'])}
+
+**Culture:**
+{country_info['culture']}
+
+The {country_info['name']} is known for its rich cultural diversity, traditional music, wrestling, and hospitality.
+
+Would you like to learn more about the daily life in this country or its cultural traditions?"""
 
     # Default response with cultural warmth
     default_responses = FALLBACK_RESPONSES["default"]
