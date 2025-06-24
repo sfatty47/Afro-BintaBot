@@ -20,9 +20,35 @@ A culturally-aware African chatbot with deep knowledge of African traditions, pr
 4. **Click "New app"**
 5. **Select your forked repository**
 6. **Set the main file path**: `streamlit_app.py`
-7. **Click "Deploy"**
+7. **Add Hugging Face Token** (see setup below)
+8. **Click "Deploy"**
 
 Your BintaBot will be live in minutes! 🌍
+
+### 🔑 Hugging Face Token Setup
+
+BintaBot uses the Mistral-7B model which requires authentication. To set up your token:
+
+1. **Get a Hugging Face Token:**
+   - Go to [Hugging Face](https://huggingface.co/settings/tokens)
+   - Sign in or create an account
+   - Click "New token"
+   - Give it a name (e.g., "BintaBot")
+   - Select "Read" permissions
+   - Copy the token
+
+2. **Add Token to Streamlit Cloud:**
+   - In your Streamlit Cloud app settings
+   - Go to "Secrets" section
+   - Add this configuration:
+   ```toml
+   HF_TOKEN = "your_hugging_face_token_here"
+   ```
+
+3. **Alternative: Use Fallback Model**
+   - If you don't want to set up a token, the app will automatically use a fallback model
+   - The fallback model is open-access and doesn't require authentication
+   - You'll still get cultural responses, though they may be less sophisticated
 
 **Note**: The cloud version focuses on text-based cultural exchange. Voice features are available in the local version.
 
@@ -48,6 +74,11 @@ brew install portaudio
 # Install cmake (if needed)
 brew install cmake
 ```
+
+4. **Set up Hugging Face Token (Optional):**
+   - Create `.streamlit/secrets.toml` file
+   - Add: `HF_TOKEN = "your_token_here"`
+   - This enables the full Mistral-7B model locally
 
 ## 🛠️ Usage
 
@@ -111,7 +142,7 @@ streamlit run chatbot_ui.py
 ```
 fatoubot/
 ├── streamlit_app.py      # Main app for Streamlit Cloud deployment (text-only)
-├── model.py              # Mistral-7B model loading
+├── model.py              # Mistral-7B model loading with fallback
 ├── chatbot.py            # Core chat logic with BintaBot prompt
 ├── voice_utils.py        # Voice recognition and TTS utilities (local)
 ├── voice_chatbot.py      # Command-line voice interface (local)
@@ -120,7 +151,8 @@ fatoubot/
 ├── api.py                # FastAPI backend with voice endpoints (local)
 ├── requirements.txt      # Python dependencies
 ├── .streamlit/           # Streamlit configuration
-│   └── config.toml
+│   ├── config.toml
+│   └── secrets.toml      # Hugging Face token (local only)
 └── README.md            # This file
 ```
 
@@ -170,10 +202,18 @@ BintaBot is designed with deep knowledge of:
 ## 🐛 Troubleshooting
 
 ### Streamlit Cloud Issues
-- Voice features are not available in cloud environment
-- Text chat will always work
+- **Model Loading Errors**: Check if Hugging Face token is properly set in secrets
+- **Fallback Model**: If Mistral-7B fails, the app automatically uses DialoGPT-medium
+- **Voice features are not available** in cloud environment
+- **Text chat will always work** with fallback responses
 - Check deployment logs for errors
 - Ensure all dependencies are properly specified
+
+### Hugging Face Token Issues
+- **Token not working**: Ensure token has "Read" permissions
+- **Model access denied**: Accept the model terms on Hugging Face website
+- **Token expired**: Generate a new token
+- **Fallback mode**: The app will work with open-access models if token fails
 
 ### Local Voice Issues
 - Ensure microphone permissions are granted
