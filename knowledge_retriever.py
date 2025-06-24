@@ -130,37 +130,64 @@ def get_wikipedia_content(topic):
         st.warning(f"Wikipedia error: {str(e)}")
         return None
 
-def get_enhanced_african_knowledge(query):
-    """Get enhanced knowledge about Africa from online sources"""
+def get_enhanced_african_knowledge(query, max_results=5):
+    """
+    Enhanced knowledge retrieval with better African content filtering
+    """
     try:
-        # Search for information
-        search_results = search_african_knowledge(query)
-        if not search_results:
-            return None
-            
-        # Get Wikipedia content if available
-        wiki_content = None
-        if search_results['wiki_results']:
-            wiki_content = get_wikipedia_content(search_results['wiki_results'][0])
+        # Clean and enhance the query for better African-focused results
+        enhanced_query = enhance_query_for_africa(query)
         
-        # Process DuckDuckGo results
-        ddg_info = []
-        for result in search_results['ddg_results']:
-            ddg_info.append({
-                'title': result.get('title', ''),
-                'snippet': result.get('body', ''),
-                'link': result.get('link', '')
-            })
+        # Get Wikipedia results
+        wiki_results = search_wikipedia(enhanced_query, max_results)
         
-        return {
-            'wikipedia': wiki_content,
-            'web_results': ddg_info,
-            'query': search_results['query']
+        # Get web search results
+        web_results = search_web(enhanced_query, max_results)
+        
+        # Filter and combine results
+        filtered_results = {
+            'wikipedia': filter_african_content(wiki_results),
+            'web_results': filter_african_content(web_results)
         }
         
+        return filtered_results
+        
     except Exception as e:
-        st.error(f"Knowledge retrieval error: {str(e)}")
+        st.error(f"Error retrieving knowledge: {str(e)}")
         return None
+
+def enhance_query_for_africa(query):
+    """
+    Enhance query to get better African-focused results
+    """
+    query_lower = query.lower()
+    
+    # Add African context for general topics
+    if any(word in query_lower for word in ['slavery', 'slave', 'enslavement']):
+        return f"African slavery history transatlantic slave trade"
+    elif any(word in query_lower for word in ['culture', 'cultural']):
+        return f"African culture traditions {query}"
+    elif any(word in query_lower for word in ['history', 'historical']):
+        return f"African history {query}"
+    elif any(word in query_lower for word in ['story', 'stories', 'tale']):
+        return f"African stories folktales {query}"
+    elif any(word in query_lower for word in ['tribe', 'ethnic', 'people']):
+        return f"African ethnic groups tribes {query}"
+    elif any(word in query_lower for word in ['language', 'languages']):
+        return f"African languages {query}"
+    elif any(word in query_lower for word in ['music', 'dance', 'art']):
+        return f"African music dance art {query}"
+    elif any(word in query_lower for word in ['food', 'cuisine', 'dish']):
+        return f"African food cuisine {query}"
+    elif any(word in query_lower for word in ['religion', 'spiritual', 'belief']):
+        return f"African religion spirituality {query}"
+    elif any(word in query_lower for word in ['kingdom', 'empire', 'dynasty']):
+        return f"African kingdoms empires {query}"
+    elif any(word in query_lower for word in ['leader', 'king', 'queen', 'chief']):
+        return f"African leaders kings queens {query}"
+    else:
+        # For general queries, add African context
+        return f"Africa African {query}"
 
 def format_knowledge_response(knowledge_data):
     """Format knowledge data into a readable response"""
@@ -226,3 +253,55 @@ def get_african_topic_suggestions(category=None):
         for topics in AFRICAN_KNOWLEDGE_SOURCES.values():
             all_topics.extend(topics)
         return all_topics 
+
+def filter_african_content(results):
+    """
+    Filter results to prioritize African content and remove irrelevant results
+    """
+    if not results:
+        return []
+    
+    african_keywords = [
+        'africa', 'african', 'west africa', 'east africa', 'south africa', 'north africa',
+        'sub-saharan', 'sahel', 'sahara', 'niger', 'senegal', 'gambia', 'ghana', 'mali',
+        'nigeria', 'kenya', 'ethiopia', 'somalia', 'sudan', 'egypt', 'morocco', 'tunisia',
+        'algeria', 'libya', 'chad', 'cameroon', 'congo', 'zimbabwe', 'zambia', 'tanzania',
+        'uganda', 'rwanda', 'burundi', 'angola', 'mozambique', 'namibia', 'botswana',
+        'lesotho', 'eswatini', 'madagascar', 'mauritius', 'seychelles', 'comoros',
+        'guinea', 'guinea-bissau', 'sierra leone', 'liberia', 'ivory coast', 'togo',
+        'benin', 'burkina faso', 'niger', 'chad', 'central african republic',
+        'equatorial guinea', 'gabon', 'republic of congo', 'democratic republic of congo',
+        'south sudan', 'eritrea', 'djibouti', 'cape verde', 'sao tome and principe'
+    ]
+    
+    # Keywords that indicate non-African content to exclude
+    exclude_keywords = [
+        'american', 'united states', 'usa', 'european', 'europe', 'asian', 'asia',
+        'latin american', 'caribbean', 'australian', 'australia', 'canadian', 'canada'
+    ]
+    
+    filtered_results = []
+    
+    for result in results:
+        if isinstance(result, dict):
+            title = result.get('title', '').lower()
+            snippet = result.get('snippet', '').lower()
+            content = f"{title} {snippet}"
+        else:
+            content = str(result).lower()
+        
+        # Check if content contains African keywords
+        has_african_content = any(keyword in content for keyword in african_keywords)
+        
+        # Check if content should be excluded
+        should_exclude = any(keyword in content for keyword in exclude_keywords)
+        
+        # Include if it has African content and shouldn't be excluded
+        if has_african_content and not should_exclude:
+            filtered_results.append(result)
+    
+    # If no African content found, return original results but limit to 3
+    if not filtered_results and results:
+        return results[:3]
+    
+    return filtered_results 

@@ -126,37 +126,51 @@ BintaBot:"""
         rag_response = get_rag_response(user_input, chat_history)
         
         # Check if RAG found relevant information (not just a generic response)
-        if rag_response and len(rag_response) > 50 and not any(word in rag_response.lower() for word in ["i am here to share", "what specific aspect", "help you learn"]):
+        # Also check if the response actually matches the query
+        rag_is_relevant = (
+            rag_response and 
+            len(rag_response) > 50 and 
+            not any(word in rag_response.lower() for word in ["i am here to share", "what specific aspect", "help you learn"]) and
+            # Check if the response actually relates to the query
+            any(word in user_input.lower() for word in rag_response.lower()[:200])
+        )
+        
+        if rag_is_relevant:
             response = rag_response
         else:
-            # Try knowledge retrieval system for online information
-            try:
-                from knowledge_retriever import get_enhanced_african_knowledge, format_knowledge_response
-                
-                with st.spinner("🔍 Searching for information about this African topic..."):
-                    enhanced_knowledge = get_enhanced_african_knowledge(user_input)
-                
-                if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
-                    formatted_response = format_knowledge_response(enhanced_knowledge)
-                    if formatted_response:
-                        # Add cultural warmth to the response
-                        response = f"""Ah, my child, let me share with you what I have learned about this topic from our collective knowledge...
+            # Try specific fallback responses for common topics
+            fallback_response = get_african_fallback_response(user_input)
+            if fallback_response:
+                response = fallback_response
+            else:
+                # Try knowledge retrieval system for online information
+                try:
+                    from knowledge_retriever import get_enhanced_african_knowledge, format_knowledge_response
+                    
+                    with st.spinner("🔍 Searching for information about this African topic..."):
+                        enhanced_knowledge = get_enhanced_african_knowledge(user_input)
+                    
+                    if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
+                        formatted_response = format_knowledge_response(enhanced_knowledge)
+                        if formatted_response:
+                            # Add cultural warmth to the response
+                            response = f"""Ah, my child, let me share with you what I have learned about this topic from our collective knowledge...
 
 {formatted_response}
 
 As our elders say, 'Knowledge is like a garden: if it is not cultivated, it cannot be harvested.' Let us continue to learn and grow together.
 
 Would you like to explore more about this topic or learn about related aspects of African culture?"""
+                        else:
+                            # Fall back to model generation
+                            response = generate_response(final_prompt)
                     else:
                         # Fall back to model generation
                         response = generate_response(final_prompt)
-                else:
-                    # Fall back to model generation
-                    response = generate_response(final_prompt)
                     
-            except ImportError:
-                # Knowledge retrieval not available, fall back to model generation
-                response = generate_response(final_prompt)
+                except ImportError:
+                    # Knowledge retrieval not available, fall back to model generation
+                    response = generate_response(final_prompt)
         
         # Post-process to ensure cultural warmth
         if response and not response.startswith("I am BintaBot"):
@@ -289,4 +303,127 @@ def add_to_chat_history(user_input, response):
     
     # Keep only last 10 conversations to manage memory
     if len(st.session_state.chat_history) > 10:
-        st.session_state.chat_history = st.session_state.chat_history[-10:] 
+        st.session_state.chat_history = st.session_state.chat_history[-10:]
+
+def get_african_fallback_response(query):
+    """
+    Provide specific fallback responses for common African topics
+    """
+    query_lower = query.lower()
+    
+    # Slavery and its causes
+    if any(word in query_lower for word in ['slavery', 'slave', 'enslavement', 'what led to slavery']):
+        return """Ah, my child, this is a painful chapter in our history that we must remember and learn from...
+
+The transatlantic slave trade, which lasted from the 15th to the 19th centuries, was driven by several factors:
+
+**Economic Factors:**
+- European demand for cheap labor in the Americas for sugar, cotton, and tobacco plantations
+- The triangular trade system: European goods → African slaves → American products
+- The profitability of the slave trade for European merchants and African middlemen
+
+**Political Factors:**
+- European colonial expansion and the need for labor in new territories
+- African kingdoms and empires participating in the trade for weapons and goods
+- The weakening of some African societies through internal conflicts
+
+**Social Factors:**
+- Racial ideologies that dehumanized African people
+- The belief that Africans were inferior and meant for servitude
+- The breakdown of traditional African social structures
+
+**Impact on Africa:**
+- Depopulation of many regions, especially West Africa
+- Disruption of traditional societies and cultures
+- Economic dependency on European goods
+- Long-term psychological and social trauma
+
+**Resistance and Resilience:**
+Despite these horrors, African people showed incredible resilience. Many resisted through:
+- Armed rebellions and uprisings
+- Cultural preservation and adaptation
+- Spiritual resistance and maintaining traditions
+- The strength of family and community bonds
+
+As our elders say, 'A people without knowledge of their past history, origin, and culture is like a tree without roots.' We must remember this history to honor those who suffered and ensure such injustices never happen again.
+
+Would you like to learn more about African resistance movements or the cultural impact of the slave trade?"""
+
+    # African culture and traditions
+    elif any(word in query_lower for word in ['culture', 'traditions', 'customs']):
+        return """Ah, let me share with you the rich tapestry of African cultures and traditions...
+
+**Diversity of African Cultures:**
+Africa is home to over 3,000 distinct ethnic groups, each with unique traditions, languages, and customs. From the Berbers of North Africa to the Zulu of South Africa, from the Yoruba of West Africa to the Maasai of East Africa, our continent is a mosaic of vibrant cultures.
+
+**Common Cultural Elements:**
+- **Ubuntu Philosophy**: "I am because we are" - the interconnectedness of all people
+- **Oral Traditions**: Storytelling, proverbs, and griots (oral historians)
+- **Community Values**: Extended family systems and communal living
+- **Spiritual Beliefs**: Connection to ancestors and the natural world
+- **Music and Dance**: Integral parts of ceremonies and daily life
+
+**Traditional Practices:**
+- **Coming of Age Ceremonies**: Marking the transition to adulthood
+- **Marriage Customs**: Complex rituals celebrating family unions
+- **Healing Traditions**: Traditional medicine and spiritual healing
+- **Agricultural Practices**: Sustainable farming methods passed down generations
+- **Art and Craftsmanship**: Pottery, weaving, metalwork, and beadwork
+
+**Modern Cultural Preservation:**
+Today, African cultures continue to thrive and adapt:
+- Cultural festivals and celebrations
+- Traditional music influencing global genres
+- African fashion and design gaining international recognition
+- Literature and film sharing African stories
+- Technology being used to preserve and share traditions
+
+As our elders say, 'Culture is the widening of the mind and of the spirit.' Our traditions teach us wisdom, connect us to our ancestors, and guide us toward a better future.
+
+Would you like to learn about specific cultural practices from particular regions or ethnic groups?"""
+
+    # African history
+    elif any(word in query_lower for word in ['history', 'historical']):
+        return """Ah, let me share with you the magnificent story of Africa's rich history...
+
+**Ancient African Civilizations:**
+Africa is the cradle of humanity and home to some of the world's oldest civilizations:
+
+- **Ancient Egypt** (3100 BCE - 30 BCE): The Nile Valley civilization with pyramids, pharaohs, and advanced knowledge
+- **Kingdom of Kush** (1070 BCE - 350 CE): Powerful Nubian kingdom that ruled Egypt
+- **Axum Empire** (100 CE - 940 CE): Trading empire in modern Ethiopia
+- **Ghana Empire** (300-1200 CE): First great West African trading empire
+- **Mali Empire** (1235-1670 CE): Home to Mansa Musa and the wealth of Timbuktu
+- **Songhai Empire** (1464-1591 CE): Largest empire in West African history
+- **Great Zimbabwe** (1100-1450 CE): Stone city and trading center
+- **Benin Empire** (1180-1897 CE): Known for its bronze art and walled cities
+
+**Medieval African Kingdoms:**
+- **Ethiopian Empire**: One of the world's oldest continuous monarchies
+- **Swahili Coast**: Trading cities connecting Africa to the Indian Ocean
+- **Hausa Kingdoms**: City-states in northern Nigeria
+- **Yoruba Kingdoms**: Ife, Oyo, and other powerful states
+- **Ashanti Empire**: Gold-rich kingdom in modern Ghana
+
+**Colonial Period (1880s-1960s):**
+- European scramble for Africa
+- Resistance movements and independence struggles
+- Impact on African societies and cultures
+
+**Post-Independence Era:**
+- Nation-building and development challenges
+- Pan-African movements and unity efforts
+- Modern African renaissance and growth
+
+**Key Historical Themes:**
+- **Trade Networks**: Trans-Saharan, Indian Ocean, and Atlantic trade
+- **Cultural Exchange**: Spread of religions, languages, and ideas
+- **Innovation**: Advanced metallurgy, architecture, and agriculture
+- **Resistance**: Against external domination and for self-determination
+- **Resilience**: Maintaining identity and culture through challenges
+
+As our elders say, 'The past is a guide to the future.' Understanding our history helps us build a stronger, more united Africa.
+
+Would you like to learn about specific periods, empires, or historical figures?"""
+
+    return None 
