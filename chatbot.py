@@ -4,23 +4,21 @@ import streamlit as st
 import time
 import re
 
-# System prompt with anti-repetition instructions
-SYSTEM_PROMPT = """You are BintaBot, a wise African cultural assistant with deep knowledge of African history, culture, traditions, and wisdom. You speak with the warmth and wisdom of an African elder, sharing knowledge with love and respect.
+# Enhanced system prompt with topic awareness
+SYSTEM_PROMPT = """You are BintaBot, a wise and culturally-grounded African assistant.
+
+You deeply understand African history, traditions, music, languages, proverbs, religion, and social values. You speak with warmth, clarity, and cultural pride.
+
+When someone asks a question, first understand the main topic (e.g., history, music, tribe, culture, geography, spirituality). Then focus only on that theme. Avoid repeating facts or going off-topic.
+
+Use African proverbs, stories, or examples when helpful. If the question is about two or more places or cultures, compare them clearly and respectfully.
 
 **Core Instructions:**
-- Avoid repeating phrases or facts in a single response
-- Present answers clearly, concisely, and warmly — like an elder teaching the next generation
-- Provide culturally rich and warm explanations with no duplication
-- If you've already mentioned something in the current response, don't repeat it
-- Use diverse vocabulary and sentence structures
-- Connect information in a flowing, natural way
-
-**Cultural Approach:**
-- Begin responses with warm African greetings when appropriate
-- Share wisdom through proverbs and traditional sayings
-- Emphasize the interconnectedness of African cultures
-- Highlight the resilience and strength of African people
-- Encourage learning and curiosity about African heritage
+- Detect the user's intent and focus on the main topic
+- Present information clearly, concisely, and warmly
+- Avoid repetition within the same response
+- Use diverse vocabulary and natural flow
+- Connect information in a culturally meaningful way
 
 **Response Style:**
 - Be informative yet warm and engaging
@@ -138,8 +136,11 @@ Question: {user_input}
 
 BintaBot:"""
 
-    # Generate response with enhanced prompt
+    # Generate response with enhanced topic-aware system
     try:
+        # Detect the topic for better response focus
+        topic = detect_topic(user_input)
+        
         # First, try RAG system for better cultural responses
         rag_response = get_rag_response(user_input, chat_history)
         
@@ -165,31 +166,31 @@ BintaBot:"""
                 try:
                     from knowledge_retriever import get_enhanced_african_knowledge, format_knowledge_response
                     
-                    with st.spinner("🔍 Searching for information about this African topic..."):
+                    with st.spinner(f"🔍 Searching for information about {topic}..."):
                         enhanced_knowledge = get_enhanced_african_knowledge(user_input)
                     
                     if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
                         formatted_response = format_knowledge_response(enhanced_knowledge)
                         if formatted_response:
                             # Add cultural warmth to the response
-                            response = f"""Ah, my child, let me share with you what I have learned about this topic from our collective knowledge...
+                            response = f"""Ah, my child, let me share with you what I have learned about {topic} from our collective knowledge...
 
 {formatted_response}
 
 As our elders say, 'Knowledge is like a garden: if it is not cultivated, it cannot be harvested.' Let us continue to learn and grow together.
 
-Would you like to explore more about this topic or learn about related aspects of African culture?"""
+Would you like to explore more about {topic} or learn about related aspects of African culture?"""
                             response = clean_response(response)
                         else:
-                            # Fall back to model generation
-                            response = clean_response(generate_response(final_prompt))
+                            # Fall back to topic-aware model generation
+                            response = generate_response(user_input)
                     else:
-                        # Fall back to model generation
-                        response = clean_response(generate_response(final_prompt))
+                        # Fall back to topic-aware model generation
+                        response = generate_response(user_input)
                     
                 except ImportError:
-                    # Knowledge retrieval not available, fall back to model generation
-                    response = clean_response(generate_response(final_prompt))
+                    # Knowledge retrieval not available, fall back to topic-aware model generation
+                    response = generate_response(user_input)
         
         # Post-process to ensure cultural warmth
         if response and not response.startswith("I am BintaBot"):
@@ -329,6 +330,7 @@ def get_african_fallback_response(query):
     Provide specific fallback responses for common African topics
     """
     query_lower = query.lower()
+    topic = detect_topic(query)
     
     # Slavery and its causes
     if any(word in query_lower for word in ['slavery', 'slave', 'enslavement', 'what led to slavery']):
@@ -368,8 +370,122 @@ As our elders say, 'A people without knowledge of their past history, origin, an
 
 Would you like to learn more about African resistance movements or the cultural impact of the slave trade?"""
 
+    # African spirituality and religion
+    elif topic == "religion" or any(word in query_lower for word in ['spiritual', 'spirituality', 'belief', 'faith']):
+        return """Ah, let me share with you the rich spiritual traditions of Africa...
+
+**Traditional African Spirituality:**
+African spirituality is deeply rooted in the belief that all things are connected - the living, the dead, and the natural world. It emphasizes harmony with nature and respect for ancestors.
+
+**Key Beliefs:**
+- **Ancestor Veneration**: Honoring those who came before us as guides and protectors
+- **Nature Connection**: Seeing the divine in mountains, rivers, trees, and animals
+- **Community Focus**: Spiritual practices that strengthen family and community bonds
+- **Balance and Harmony**: Maintaining equilibrium between physical and spiritual worlds
+
+**Diverse Traditions:**
+- **Yoruba Religion**: Orishas (deities) representing natural forces and human qualities
+- **Akan Spirituality**: Belief in Nyame (Supreme Being) and lesser spirits
+- **Zulu Traditions**: Connection to ancestors through rituals and ceremonies
+- **Igbo Spirituality**: Chi (personal spirit) and community-based practices
+
+**Modern Expressions:**
+Today, African spirituality continues through:
+- Traditional ceremonies and rituals
+- Modern African churches and religious movements
+- Cultural festivals and celebrations
+- Art, music, and dance as spiritual expression
+
+**Respect for Elders:**
+In African spirituality, elders are seen as bridges between the living and the ancestors. Their wisdom, gained through experience and connection to tradition, is highly valued and respected.
+
+As our elders say, 'The spirit of the ancestors lives in the wisdom of the elders.' This respect for age and experience is central to African spiritual and cultural values.
+
+Would you like to learn about specific spiritual practices or how African spirituality influences modern life?"""
+
+    # African music and dance
+    elif topic == "music" or any(word in query_lower for word in ['music', 'dance', 'rhythm', 'drum']):
+        return """Ah, let me share with you the heartbeat of Africa through music and dance...
+
+**The Power of African Music:**
+Music in Africa is not just entertainment - it's a way of life, a form of communication, and a bridge between the physical and spiritual worlds.
+
+**Traditional Instruments:**
+- **Drums**: The heartbeat of Africa - djembe, talking drums, sabar, and many more
+- **String Instruments**: Kora (West Africa), mbira (Southern Africa), oud (North Africa)
+- **Wind Instruments**: Flutes, horns, and traditional trumpets
+- **Percussion**: Shakers, bells, and rattles made from natural materials
+
+**Musical Traditions:**
+- **Griot Music**: Storytelling through song, preserving history and culture
+- **Call and Response**: Interactive music that brings communities together
+- **Polyrhythms**: Complex, layered rhythms that create rich musical textures
+- **Improvisation**: Spontaneous creativity within traditional structures
+
+**Modern African Music:**
+- **Afrobeat**: Fela Kuti's revolutionary fusion of traditional and modern sounds
+- **Highlife**: Ghana's dance music blending traditional and Western instruments
+- **Mbalax**: Senegal's rhythmic dance music with Wolof lyrics
+- **Afropop**: Contemporary African pop music with global influence
+
+**Dance as Expression:**
+African dance tells stories, celebrates life events, and connects people to their heritage. Each movement has meaning, from the graceful steps of West African dance to the powerful movements of Southern African traditions.
+
+**Cultural Significance:**
+Music and dance serve many purposes:
+- Celebrating births, marriages, and other life events
+- Honoring ancestors and spiritual beings
+- Teaching history and cultural values
+- Building community and social bonds
+- Expressing joy, sorrow, and all human emotions
+
+As our elders say, 'When the drum speaks, the heart listens.' Music and dance continue to be powerful forces in African culture, connecting past and present, young and old.
+
+Would you like to learn about specific musical traditions or how African music has influenced global culture?"""
+
+    # African family and respect for elders
+    elif topic == "family" or any(word in query_lower for word in ['elder', 'elders', 'family', 'respect']):
+        return """Ah, let me share with you the sacred bond of family and the wisdom of our elders...
+
+**The African Family:**
+In African cultures, family extends far beyond parents and children. It includes grandparents, aunts, uncles, cousins, and even close family friends. This extended family system provides support, guidance, and a sense of belonging.
+
+**Respect for Elders:**
+Elders are the living libraries of our communities, carrying the wisdom, stories, and traditions passed down through generations. Their experience and knowledge are highly valued and respected.
+
+**Traditional Values:**
+- **Ubuntu**: "I am because we are" - the interconnectedness of all people
+- **Collective Responsibility**: The well-being of each person is everyone's concern
+- **Intergenerational Learning**: Knowledge flows from elders to younger generations
+- **Community Support**: Families and communities work together for mutual benefit
+
+**Elder Wisdom:**
+Elders serve many important roles:
+- **Storytellers**: Passing down history, culture, and moral lessons
+- **Advisors**: Providing guidance on life decisions and community matters
+- **Healers**: Using traditional knowledge for physical and spiritual healing
+- **Peacemakers**: Resolving conflicts and maintaining harmony
+- **Teachers**: Imparting skills, crafts, and cultural practices
+
+**Modern Challenges and Adaptations:**
+While urbanization and modern life have changed some family structures, the core values remain strong:
+- Many families maintain close connections despite physical distance
+- Technology helps bridge gaps between generations
+- Cultural practices continue to be passed down
+- Respect for elders remains a fundamental value
+
+**Ceremonies and Rituals:**
+- **Naming Ceremonies**: Welcoming new members into the family
+- **Coming of Age**: Marking the transition to adulthood
+- **Marriage Celebrations**: Uniting families and communities
+- **Funeral Rites**: Honoring the deceased and supporting the living
+
+As our elders say, 'A child who has washed their hands can dine with kings.' This proverb teaches that respect, wisdom, and proper behavior open doors to great opportunities.
+
+Would you like to learn about specific family traditions or how African family values influence modern life?"""
+
     # African culture and traditions
-    elif any(word in query_lower for word in ['culture', 'traditions', 'customs']):
+    elif topic == "culture" or any(word in query_lower for word in ['culture', 'traditions', 'customs']):
         return """Ah, let me share with you the rich tapestry of African cultures and traditions...
 
 **Diversity of African Cultures:**
@@ -402,7 +518,7 @@ As our elders say, 'Culture is the widening of the mind and of the spirit.' Our 
 Would you like to learn about specific cultural practices from particular regions or ethnic groups?"""
 
     # African history
-    elif any(word in query_lower for word in ['history', 'historical']):
+    elif topic == "history" or any(word in query_lower for word in ['history', 'historical']):
         return """Ah, let me share with you the magnificent story of Africa's rich history...
 
 **Ancient African Civilizations:**
@@ -497,23 +613,147 @@ def format_chat_history_for_context(chat_history, max_messages=4):
     
     return ""
 
-def generate_response(prompt):
-    """Generate response using the loaded model"""
+def reflect_and_improve_response(raw_response, query, topic):
+    """
+    Review and improve the response to ensure quality and relevance
+    """
+    if not raw_response or len(raw_response) < 20:
+        return raw_response
+    
+    reflection_prompt = f"""You are BintaBot, reviewing your own answer below.
+
+**Original Question:** {query}
+**Topic Focus:** {topic}
+
+**Review Criteria:**
+- Is the response relevant to the question?
+- Are there any redundant or repetitive sections?
+- Is the information clear and well-organized?
+- Does it maintain a warm, culturally-aware tone?
+- Is it concise yet comprehensive?
+
+**Current Answer:**
+{raw_response}
+
+**Instructions:** Improve the answer by:
+- Removing redundancy and repetition
+- Ensuring focus on the main topic
+- Maintaining cultural warmth and authenticity
+- Making it clear and engaging
+- Keeping the wise elder voice
+
+**Improved Answer:**"""
+    
     try:
-        # Add context from recent chat history to prevent repetition
-        chat_context = format_chat_history_for_context(st.session_state.chat_history)
+        improved_response = model.generate(reflection_prompt, max_length=len(raw_response) + 100, temperature=0.3, do_sample=True)
+        return clean_response(improved_response.strip())
+    except Exception as e:
+        # If reflection fails, return the original cleaned response
+        return clean_response(raw_response)
+
+def generate_response(prompt):
+    """Generate response using the loaded model with topic awareness"""
+    try:
+        # Detect the topic
+        topic = detect_topic(prompt)
         
-        # Create enhanced prompt with context
-        enhanced_prompt = f"{SYSTEM_PROMPT}\n\n{chat_context}Current question: {prompt}\n\nPlease avoid repeating information. Provide a culturally rich and warm explanation with no duplication."
+        # Create focused prompt
+        focused_prompt = create_focused_prompt(prompt, topic, st.session_state.chat_history)
         
-        # Generate response
-        response = model.generate(enhanced_prompt, max_length=512, temperature=0.7, do_sample=True)
+        # Generate initial response
+        raw_response = model.generate(focused_prompt, max_length=512, temperature=0.7, do_sample=True)
         
-        # Clean the response to remove duplicates
-        cleaned_response = clean_response(response)
+        # Reflect and improve the response
+        improved_response = reflect_and_improve_response(raw_response, prompt, topic)
         
-        return cleaned_response
+        return improved_response
         
     except Exception as e:
         st.error(f"Error generating response: {str(e)}")
-        return "I apologize, but I'm having trouble generating a response right now. Please try again." 
+        return "I apologize, but I'm having trouble generating a response right now. Please try again."
+
+def detect_topic(query):
+    """
+    Classify the topic of a user query to focus the response
+    """
+    query_lower = query.lower()
+    
+    # Topic detection based on keywords
+    topic_keywords = {
+        "music": ["music", "song", "dance", "rhythm", "drum", "instrument", "melody", "beat", "mbalax", "afrobeat", "highlife"],
+        "history": ["history", "historical", "ancient", "empire", "kingdom", "dynasty", "century", "period", "past", "traditional"],
+        "culture": ["culture", "cultural", "tradition", "custom", "ceremony", "ritual", "festival", "celebration", "heritage"],
+        "language": ["language", "linguistic", "speak", "tongue", "dialect", "word", "proverb", "saying", "expression"],
+        "tribe": ["tribe", "ethnic", "people", "group", "community", "clan", "family", "lineage", "ancestry"],
+        "religion": ["religion", "spiritual", "belief", "faith", "god", "ancestor", "sacred", "divine", "worship", "prayer"],
+        "geography": ["country", "region", "land", "place", "location", "area", "territory", "border", "coast", "river"],
+        "politics": ["government", "leader", "president", "king", "queen", "chief", "ruler", "politics", "power", "authority"],
+        "education": ["learn", "teach", "school", "education", "knowledge", "wisdom", "study", "university", "academic"],
+        "philosophy": ["philosophy", "thought", "idea", "concept", "principle", "value", "belief", "wisdom", "understanding"],
+        "food": ["food", "cuisine", "dish", "meal", "cooking", "recipe", "ingredient", "spice", "flavor", "taste"],
+        "art": ["art", "craft", "sculpture", "painting", "design", "pattern", "beadwork", "textile", "pottery"],
+        "family": ["family", "elder", "parent", "child", "grandparent", "ancestor", "relative", "kinship", "respect"],
+        "trade": ["trade", "commerce", "market", "business", "economy", "wealth", "gold", "salt", "exchange"],
+        "medicine": ["medicine", "healing", "health", "traditional", "herb", "cure", "treatment", "wellness"]
+    }
+    
+    # Count keyword matches for each topic
+    topic_scores = {}
+    for topic, keywords in topic_keywords.items():
+        score = sum(1 for keyword in keywords if keyword in query_lower)
+        if score > 0:
+            topic_scores[topic] = score
+    
+    # Return the topic with the highest score, or "general" if no clear topic
+    if topic_scores:
+        return max(topic_scores, key=topic_scores.get)
+    else:
+        return "general"
+
+def create_focused_prompt(query, topic, chat_history=None):
+    """
+    Create a topic-focused prompt for better response generation
+    """
+    # Add context from recent chat history
+    context = ""
+    if chat_history and len(chat_history) > 2:
+        recent = chat_history[-2:]
+        context = f"\nRecent context: {recent[0]} → {recent[1][:100]}...\n"
+    
+    # Create topic-specific instructions
+    topic_instructions = {
+        "music": "Focus on musical traditions, instruments, rhythms, and cultural significance. Mention specific genres, artists, or musical events when relevant.",
+        "history": "Focus on historical events, figures, timelines, and their impact. Connect past events to present significance.",
+        "culture": "Focus on traditions, customs, values, and cultural practices. Emphasize the diversity and richness of African cultures.",
+        "language": "Focus on linguistic diversity, language families, communication, and cultural expression through language.",
+        "tribe": "Focus on ethnic groups, their characteristics, traditions, and cultural contributions. Respect the diversity of African peoples.",
+        "religion": "Focus on spiritual beliefs, practices, and their role in African societies. Respect different religious traditions.",
+        "geography": "Focus on physical features, locations, and their cultural significance. Connect geography to human experience.",
+        "politics": "Focus on governance, leadership, and political structures. Emphasize African perspectives and achievements.",
+        "education": "Focus on learning, knowledge transmission, and educational traditions. Highlight African wisdom and teaching methods.",
+        "philosophy": "Focus on African thought systems, values, and worldviews. Explore concepts like Ubuntu and traditional wisdom.",
+        "food": "Focus on culinary traditions, ingredients, and the cultural significance of food in African societies.",
+        "art": "Focus on artistic traditions, craftsmanship, and cultural expression through visual arts.",
+        "family": "Focus on family structures, respect for elders, and intergenerational relationships in African cultures.",
+        "trade": "Focus on economic systems, trade routes, and commercial traditions in African history.",
+        "medicine": "Focus on traditional healing practices, medicinal knowledge, and health traditions.",
+        "general": "Provide a comprehensive, culturally-rich response that covers multiple relevant aspects of the topic."
+    }
+    
+    instruction = topic_instructions.get(topic, topic_instructions["general"])
+    
+    return f"""{SYSTEM_PROMPT}
+
+**Topic Focus:** {topic.title()}
+**Topic Instruction:** {instruction}
+{context}
+**Current Question:** {query}
+
+Please provide a focused, culturally-rich response that:
+- Addresses the specific topic clearly
+- Avoids repeating information
+- Presents facts warmly and respectfully
+- Includes relevant cultural context
+- Maintains the voice of a wise African elder
+
+Response:""" 

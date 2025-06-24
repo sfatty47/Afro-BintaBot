@@ -580,16 +580,35 @@ rag_system = AfricanRAGSystem()
 
 def get_rag_response(query, chat_history=None):
     """
-    Get response from RAG system with improved diversity to reduce duplication
+    Get response from RAG system with topic awareness and improved diversity
     """
     try:
-        # Use the existing RAG system
+        # Import topic detection from chatbot
+        from chatbot import detect_topic, create_focused_prompt
+        
+        # Detect topic for better search focus
+        topic = detect_topic(query)
+        
+        # Use the existing RAG system with topic-aware search
         response = rag_system.generate_rag_response(query, chat_history)
         
         if response:
+            # Create topic-focused prompt for better response
+            focused_prompt = create_focused_prompt(query, topic, chat_history)
+            
             # Clean the response to remove any duplicates
             from chatbot import clean_response
             cleaned_response = clean_response(response)
+            
+            # If the response is too generic, try to improve it with topic focus
+            if len(cleaned_response) < 100 or "i am here to share" in cleaned_response.lower():
+                # Generate a more focused response
+                try:
+                    improved_response = model.generate(focused_prompt, max_length=400, temperature=0.7, do_sample=True)
+                    return clean_response(improved_response.strip())
+                except:
+                    return cleaned_response
+            
             return cleaned_response
         
         return None
