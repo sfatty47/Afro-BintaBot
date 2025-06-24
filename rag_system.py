@@ -28,18 +28,21 @@ class AfricanRAGSystem:
                     "keywords": [figure_info['name'].lower(), figure_key, "leader", "president", "emperor", "founder"]
                 },
                 {
-                    "content": f"{figure_info['name']} achievements: {', '.join(figure_info['achievements'])}",
-                    "topic": figure_key,
-                    "category": "historical_figure",
-                    "keywords": [figure_info['name'].lower(), figure_key, "achievements", "accomplishments"]
-                },
-                {
                     "content": f"{figure_info['name']} legacy: {figure_info['legacy']}",
                     "topic": figure_key,
                     "category": "historical_figure",
                     "keywords": [figure_info['name'].lower(), figure_key, "legacy", "impact", "influence"]
                 }
             ])
+            
+            # Add achievements chunk only if it exists
+            if 'achievements' in figure_info:
+                chunks.append({
+                    "content": f"{figure_info['name']} achievements: {', '.join(figure_info['achievements'])}",
+                    "topic": figure_key,
+                    "category": "historical_figure",
+                    "keywords": [figure_info['name'].lower(), figure_key, "achievements", "accomplishments"]
+                })
             
             # Add story if it exists
             if 'story' in figure_info:
@@ -49,6 +52,16 @@ class AfricanRAGSystem:
                     "category": "historical_figure",
                     "keywords": [figure_info['name'].lower(), figure_key, "story", "history"]
                 })
+            
+            # Add other available information
+            for key, value in figure_info.items():
+                if key not in ['name', 'title', 'period', 'legacy', 'achievements', 'story'] and isinstance(value, str):
+                    chunks.append({
+                        "content": f"{figure_info['name']} {key}: {value}",
+                        "topic": figure_key,
+                        "category": "historical_figure",
+                        "keywords": [figure_info['name'].lower(), figure_key, key]
+                    })
         
         # Country chunks
         for country_key, country_info in CULTURAL_KNOWLEDGE["countries"].items():
@@ -358,23 +371,28 @@ class AfricanRAGSystem:
         """Generate specific response for historical figures"""
         figure_info = CULTURAL_KNOWLEDGE["historical_figures"][figure_key]
         
-        return f"""Ah, {figure_info['name']}! Let me share with you the story of this remarkable African leader...
-
-{context}
-
-{figure_info['name']} was {figure_info['title']} during {figure_info['period']}. 
-
-**Key Achievements:**
-{', '.join(figure_info['achievements'])}
-
-**Legacy:**
-{figure_info['legacy']}
-
-{figure_info['story']}
-
-{figure_info['name']}'s story teaches us about leadership, vision, and the power of determination. Like the great baobab tree, their influence continues to provide shade and wisdom for generations to come.
-
-Would you like to learn more about the historical context of {figure_info['name']}'s time or their impact on African history?"""
+        # Build response dynamically based on available information
+        response_parts = [f"Ah, {figure_info['name']}! Let me share with you the story of this remarkable African leader...\n\n{context}\n\n{figure_info['name']} was {figure_info['title']} during {figure_info['period']}."]
+        
+        # Add achievements if available
+        if 'achievements' in figure_info:
+            response_parts.append(f"\n**Key Achievements:**\n{', '.join(figure_info['achievements'])}")
+        
+        # Add legacy
+        response_parts.append(f"\n**Legacy:**\n{figure_info['legacy']}")
+        
+        # Add story if available
+        if 'story' in figure_info:
+            response_parts.append(f"\n{figure_info['story']}")
+        
+        # Add other available information
+        for key, value in figure_info.items():
+            if key not in ['name', 'title', 'period', 'legacy', 'achievements', 'story'] and isinstance(value, str):
+                response_parts.append(f"\n**{key.title()}:**\n{value}")
+        
+        response_parts.append(f"\n{figure_info['name']}'s story teaches us about leadership, vision, and the power of determination. Like the great baobab tree, their influence continues to provide shade and wisdom for generations to come.\n\nWould you like to learn more about the historical context of {figure_info['name']}'s time or their impact on African history?")
+        
+        return "".join(response_parts)
     
     def _generate_ubuntu_response(self, query: str, context: str, chunks: List[Dict]) -> str:
         """Generate Ubuntu-specific response"""
