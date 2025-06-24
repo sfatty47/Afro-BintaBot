@@ -9,8 +9,23 @@ A culturally-aware African chatbot with voice capabilities, built with wisdom an
 - **Text Chat**: Traditional text-based conversation
 - **Cultural Wisdom**: Responses grounded in African traditions, proverbs, and values
 - **Multiple Interfaces**: Command-line, Streamlit UI, and FastAPI endpoints
+- **Cloud Deployment**: Ready for Streamlit Cloud deployment
 
-## 🛠️ Installation
+## 🚀 Quick Start - Streamlit Cloud
+
+### Deploy to Streamlit Cloud (Recommended)
+
+1. **Fork this repository** to your GitHub account
+2. **Go to [Streamlit Cloud](https://streamlit.io/cloud)**
+3. **Sign in** with your GitHub account
+4. **Click "New app"**
+5. **Select your forked repository**
+6. **Set the main file path**: `streamlit_app.py`
+7. **Click "Deploy"**
+
+Your BintaBot will be live in minutes! 🎉
+
+### Local Development
 
 1. **Clone and setup environment:**
 ```bash
@@ -33,9 +48,15 @@ brew install portaudio
 brew install cmake
 ```
 
-## 🚀 Usage
+## 🛠️ Usage
 
-### 1. Voice Chat (Command Line)
+### 1. Streamlit Cloud (Recommended)
+- Visit your deployed app URL
+- Use voice input button in sidebar
+- Type messages in chat box
+- Click 🔊 to hear responses
+
+### 2. Voice Chat (Command Line)
 ```bash
 python voice_chatbot.py
 ```
@@ -43,7 +64,7 @@ python voice_chatbot.py
 - Voice responses are automatic
 - Simple and intuitive interface
 
-### 2. Streamlit Voice UI
+### 3. Streamlit Voice UI (Local)
 ```bash
 streamlit run voice_ui.py
 ```
@@ -52,7 +73,7 @@ streamlit run voice_ui.py
 - Chat history with voice response options
 - Real-time speech recognition
 
-### 3. FastAPI Backend
+### 4. FastAPI Backend
 ```bash
 uvicorn api:app --reload
 ```
@@ -61,7 +82,7 @@ uvicorn api:app --reload
 - Speech-to-text endpoint: `/voice/speech-to-text`
 - Text chat endpoint: `/chat`
 
-### 4. Simple Text UI
+### 5. Simple Text UI
 ```bash
 streamlit run chatbot_ui.py
 ```
@@ -86,6 +107,7 @@ streamlit run chatbot_ui.py
 
 ```
 fatoubot/
+├── streamlit_app.py      # Main app for Streamlit Cloud deployment
 ├── model.py              # Mistral-7B model loading
 ├── chatbot.py            # Core chat logic with BintaBot prompt
 ├── voice_utils.py        # Voice recognition and TTS utilities
@@ -94,6 +116,8 @@ fatoubot/
 ├── chatbot_ui.py         # Basic text interface
 ├── api.py                # FastAPI backend with voice endpoints
 ├── requirements.txt      # Python dependencies
+├── .streamlit/           # Streamlit configuration
+│   └── config.toml
 └── README.md            # This file
 ```
 
@@ -140,6 +164,11 @@ BintaBot is designed with deep knowledge of:
 - Cultural greetings and customs
 
 ## 🐛 Troubleshooting
+
+### Streamlit Cloud Issues
+- Voice features may be limited in cloud environment
+- Text chat will always work
+- Check deployment logs for errors
 
 ### Microphone Issues
 - Ensure microphone permissions are granted
