@@ -87,16 +87,34 @@ def get_cultural_response(user_input):
     """Get a cultural response based on user input keywords with comprehensive African knowledge"""
     user_input_lower = user_input.lower()
     
-    # Sundiata Keita and Mali Empire
-    if "sundiata" in user_input_lower:
+    # Mansa Musa
+    if "mansa musa" in user_input_lower:
+        if "pilgrimage" in user_input_lower or "mecca" in user_input_lower:
+            return "Mansa Musa's pilgrimage to Mecca in 1324-1325 CE is one of the most famous journeys in African history. He traveled with 60,000 people, including 12,000 slaves, and carried so much gold that he caused inflation in Egypt and the Mediterranean. His generosity and wealth demonstrated Mali's power to the Islamic world and established Timbuktu as a center of learning."
+        elif "wealth" in user_input_lower or "gold" in user_input_lower:
+            return "Mansa Musa was incredibly wealthy, with estimates suggesting he was the richest person in history. His wealth came from Mali's control of gold mines and trade routes. During his pilgrimage, he gave away so much gold that it devalued the metal in Egypt for years. His wealth demonstrated the economic power of African empires."
+        else:
+            return "Mansa Musa (1280-1337 CE) was the most famous ruler of the Mali Empire, reigning from 1312 to 1337. He was a devout Muslim who made the famous pilgrimage to Mecca in 1324, demonstrating Mali's wealth and power to the Islamic world. Under his rule, Timbuktu became a major center of learning and culture."
+    
+    # Sundiata Keita
+    elif "sundiata" in user_input_lower:
         if "mother" in user_input_lower or "family" in user_input_lower:
-            return "Sundiata Keita's mother, Sogolon Kedjou, was a remarkable woman who played a crucial role in his rise to power. Despite Sundiata being born with a disability, his mother never gave up on him. She taught him patience, wisdom, and the importance of inner strength. When Sundiata was exiled, his mother's teachings and the memory of her love gave him the courage to return and claim his rightful place as king. Her story teaches us that a mother's love and wisdom can shape the destiny of nations."
+            return "Sundiata Keita's mother, Sogolon Kedjou, was a remarkable woman who played a crucial role in his rise to power. Despite Sundiata being born with a disability, his mother never gave up on him. She taught him patience, wisdom, and the importance of inner strength. When Sundiata was exiled, his mother's teachings and the memory of her love gave him the courage to return and claim his rightful place as king."
         elif "childhood" in user_input_lower or "early" in user_input_lower:
             return "Sundiata Keita was born around 1217 CE in Niani, Mali. As a child, he was unable to walk and was often mocked. However, his mother Sogolon Kedjou believed in his potential. At age seven, he miraculously stood and walked, showing his inner strength. This transformation marked the beginning of his journey to become the Lion King of Mali."
         elif "battle" in user_input_lower or "war" in user_input_lower or "kirina" in user_input_lower:
             return "The Battle of Kirina in 1235 CE was the decisive battle where Sundiata Keita defeated King Soumaoro Kanté of the Sosso Empire. This victory established the Mali Empire and marked the beginning of one of Africa's greatest kingdoms. Sundiata's military strategy and leadership united the Mandinka people."
         else:
             return "Sundiata Keita (1217-1255 CE) was the founder of the Mali Empire, one of Africa's greatest kingdoms. Known as the 'Lion King,' he united the Mandinka people and established a powerful empire that controlled the gold and salt trade routes. His capital was Niani, and his story is preserved through griot oral traditions."
+    
+    # Mandinka Language
+    elif "mandinka" in user_input_lower or "mandingo" in user_input_lower:
+        if "good morning" in user_input_lower or "greeting" in user_input_lower:
+            return "In Mandinka, 'Good morning' is **'I ni sogoma'** (pronounced: ee-nee soh-GOH-mah). Other common greetings include: 'I ni wula' (Good afternoon), 'I ni tilo' (Good evening), and 'I ni fanaa' (How are you?). Greetings are very important in Mandinka culture and show respect for others."
+        elif "language" in user_input_lower or "speak" in user_input_lower:
+            return "Mandinka is a Mande language spoken by the Mandinka people in West Africa, particularly in Mali, Senegal, Gambia, Guinea, and Guinea-Bissau. It's part of the larger Mande language family and has influenced other West African languages. The language is rich in proverbs and oral traditions."
+        else:
+            return "Mandinka is a Mande language spoken by the Mandinka people across West Africa. It's the language of the ancient Mali Empire and is still spoken today in Mali, Senegal, Gambia, and other West African countries. The language preserves many traditional proverbs and cultural wisdom."
     
     # Mali Empire
     elif "mali" in user_input_lower and "empire" in user_input_lower:
@@ -106,15 +124,6 @@ def get_cultural_response(user_input):
             return "The Mali Empire flourished from approximately 1235 CE to 1670 CE. It reached its peak under Mansa Musa (1312-1337 CE) and controlled territory from the Atlantic coast to Timbuktu, including parts of modern-day Mali, Senegal, Guinea, Burkina Faso, and Niger."
         else:
             return "The Mali Empire (1235-1670 CE) was one of Africa's greatest empires, centered in West Africa. Its capital was Niani, and it controlled territory from the Atlantic coast to Timbuktu. The empire was known for its wealth in gold, sophisticated government, and cultural achievements, particularly in Timbuktu."
-    
-    # Mansa Musa
-    elif "mansa musa" in user_input_lower:
-        if "pilgrimage" in user_input_lower or "mecca" in user_input_lower:
-            return "Mansa Musa's pilgrimage to Mecca in 1324-1325 CE is legendary. He traveled with 60,000 people, including 12,000 slaves, and carried so much gold that he caused inflation in Egypt and the Mediterranean. His generosity and wealth demonstrated Mali's power to the Islamic world."
-        elif "wealth" in user_input_lower or "gold" in user_input_lower:
-            return "Mansa Musa was incredibly wealthy, with estimates suggesting he was the richest person in history. His wealth came from Mali's control of gold mines and trade routes. During his pilgrimage, he gave away so much gold that it devalued the metal in Egypt for years."
-        else:
-            return "Mansa Musa (1280-1337 CE) was the most famous ruler of the Mali Empire, reigning from 1312 to 1337. He was a devout Muslim who made the famous pilgrimage to Mecca in 1324, demonstrating Mali's wealth and power to the Islamic world."
     
     # Ghana Empire
     elif "ghana" in user_input_lower and "empire" in user_input_lower:
@@ -190,7 +199,7 @@ def generate_response(prompt):
             with st.spinner("🔍 Searching for the latest information about Africa..."):
                 enhanced_knowledge = get_enhanced_african_knowledge(user_input)
                 
-            if enhanced_knowledge:
+            if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
                 formatted_response = format_knowledge_response(enhanced_knowledge)
                 if formatted_response:
                     return formatted_response
