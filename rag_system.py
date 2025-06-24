@@ -162,6 +162,53 @@ class AfricanRAGSystem:
                 "keywords": ["proverb", "wisdom", "african", "traditional"]
             })
         
+        # Ethnic groups chunks
+        for group_key, group_info in CULTURAL_KNOWLEDGE["ethnic_groups"].items():
+            chunks.extend([
+                {
+                    "content": f"{group_info['name']} - {group_info['location']} ({group_info['population']})",
+                    "topic": group_key,
+                    "category": "ethnic_group",
+                    "keywords": [group_info['name'].lower(), group_key, "tribe", "people", "ethnic"]
+                },
+                {
+                    "content": f"{group_info['name']} culture: {', '.join(group_info['culture'])}",
+                    "topic": group_key,
+                    "category": "ethnic_group",
+                    "keywords": [group_info['name'].lower(), group_key, "culture", "traditions"]
+                },
+                {
+                    "content": f"{group_info['name']} history: {group_info['history']}",
+                    "topic": group_key,
+                    "category": "ethnic_group",
+                    "keywords": [group_info['name'].lower(), group_key, "history", "origin"]
+                },
+                {
+                    "content": f"{group_info['name']} traditions: {', '.join(group_info['traditions'])}",
+                    "topic": group_key,
+                    "category": "ethnic_group",
+                    "keywords": [group_info['name'].lower(), group_key, "traditions", "customs"]
+                }
+            ])
+            
+            # Add values if they exist
+            if 'values' in group_info:
+                chunks.append({
+                    "content": f"{group_info['name']} values: {', '.join(group_info['values'])}",
+                    "topic": group_key,
+                    "category": "ethnic_group",
+                    "keywords": [group_info['name'].lower(), group_key, "values", "principles"]
+                })
+            
+            # Add famous figures if they exist
+            if 'famous_figures' in group_info:
+                chunks.append({
+                    "content": f"{group_info['name']} famous figures: {', '.join(group_info['famous_figures'])}",
+                    "topic": group_key,
+                    "category": "ethnic_group",
+                    "keywords": [group_info['name'].lower(), group_key, "famous", "leaders"]
+                })
+        
         return chunks
     
     def search_knowledge(self, query: str, top_k: int = 3) -> List[Dict]:
@@ -239,6 +286,10 @@ class AfricanRAGSystem:
         # Check for historical figures first (highest priority)
         if main_topic in CULTURAL_KNOWLEDGE["historical_figures"]:
             return self._generate_historical_figure_response(query, context, chunks, main_topic)
+        
+        # Check for ethnic groups
+        if main_topic in CULTURAL_KNOWLEDGE["ethnic_groups"]:
+            return self._generate_ethnic_group_response(query, context, chunks, main_topic)
         
         # Generate appropriate response based on topic
         if main_topic == "ubuntu":
@@ -406,6 +457,29 @@ Would you like to learn more about any specific art form or musical tradition?""
 The knowledge of our ancestors flows through me like the great rivers of Africa. Each piece of wisdom connects us to our heritage and helps us understand the beauty of our cultural traditions.
 
 Is there a specific aspect of this topic you'd like to explore further?"""
+    
+    def _generate_ethnic_group_response(self, query: str, context: str, chunks: List[Dict], group_key: str) -> str:
+        """Generate specific response for ethnic groups"""
+        group_info = CULTURAL_KNOWLEDGE["ethnic_groups"][group_key]
+        
+        return f"""Ah, the {group_info['name']}! Let me share with you the rich culture and traditions of this remarkable ethnic group...
+
+{context}
+
+The **{group_info['name']}** are one of Africa's most significant ethnic groups, with over {group_info['population']}. They are found across {group_info['location']} and speak {group_info['language']}.
+
+**Cultural Traditions:**
+{', '.join(group_info['culture'])}
+
+**History:**
+{group_info['history']}
+
+**Traditional Practices:**
+{', '.join(group_info['traditions'])}
+
+The {group_info['name']} have preserved their rich cultural heritage through generations, maintaining their traditions while adapting to modern times. Their emphasis on community, respect for elders, and preservation of cultural practices makes them a shining example of African cultural resilience.
+
+Would you like to learn more about {group_info['name']} music and instruments, their traditional ceremonies, or their cultural values?"""
     
     def _get_fallback_response(self, query: str) -> str:
         """Get fallback response when no relevant chunks are found"""

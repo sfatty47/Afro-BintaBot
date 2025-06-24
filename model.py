@@ -201,6 +201,91 @@ CULTURAL_KNOWLEDGE = {
             "Social gatherings and celebrations",
             "Communication across distances"
         ]
+    },
+    "ethnic_groups": {
+        "mandinka": {
+            "name": "Mandinka (Mandingo)",
+            "location": "West Africa (Senegal, Gambia, Guinea, Mali, Ivory Coast, Burkina Faso)",
+            "population": "Over 11 million people",
+            "language": "Mandinka (Mande language family)",
+            "culture": [
+                "Rich oral tradition with griots as storytellers and historians",
+                "Strong emphasis on family and community values",
+                "Traditional music with kora, balafon, and djembe",
+                "Famous for their epic of Sundiata Keita",
+                "Traditional clothing includes colorful robes and headwraps",
+                "Agricultural society with rice, millet, and groundnut farming"
+            ],
+            "history": "The Mandinka people trace their origins to the ancient Mali Empire. They are descendants of the Mandé people who migrated from the Niger River region. The Mandinka played a crucial role in the trans-Saharan trade and the spread of Islam in West Africa.",
+            "traditions": [
+                "Circumcision ceremonies (Kankurang)",
+                "Naming ceremonies with family gatherings",
+                "Traditional wrestling (Laamb)",
+                "Storytelling sessions with griots",
+                "Community decision-making through elders",
+                "Traditional medicine and healing practices"
+            ],
+            "values": [
+                "Respect for elders and ancestors",
+                "Community solidarity and mutual support",
+                "Education and wisdom transmission",
+                "Hospitality and generosity",
+                "Courage and resilience",
+                "Preservation of cultural heritage"
+            ],
+            "famous_figures": [
+                "Sundiata Keita - Founder of the Mali Empire",
+                "Mansa Musa - Wealthy emperor of Mali",
+                "Toumani Diabaté - Master kora player",
+                "Salif Keita - Famous musician"
+            ]
+        },
+        "yoruba": {
+            "name": "Yoruba",
+            "location": "Southwestern Nigeria, Benin, Togo",
+            "population": "Over 40 million people",
+            "language": "Yoruba (Niger-Congo family)",
+            "culture": [
+                "Rich artistic traditions including woodcarving and beadwork",
+                "Complex religious system with Orishas",
+                "Traditional drumming and dance",
+                "Famous for their elaborate festivals",
+                "Strong emphasis on education and learning",
+                "Traditional medicine and herbal knowledge"
+            ],
+            "history": "The Yoruba have one of the oldest urban civilizations in Africa, with cities like Ife and Oyo dating back over 1000 years. They developed sophisticated political systems and artistic traditions.",
+            "traditions": [
+                "Egungun masquerade festivals",
+                "Traditional wedding ceremonies",
+                "Naming ceremonies (Ikomojade)",
+                "Twin celebrations (Ibeji)",
+                "Traditional chieftaincy system",
+                "Ifa divination system"
+            ]
+        },
+        "zulu": {
+            "name": "Zulu",
+            "location": "South Africa (KwaZulu-Natal)",
+            "population": "Over 12 million people",
+            "language": "Zulu (Bantu language family)",
+            "culture": [
+                "Famous for their warrior traditions",
+                "Traditional beadwork and basket weaving",
+                "Complex social structure with clans",
+                "Traditional music with drums and singing",
+                "Famous for their traditional dances",
+                "Strong cattle-herding traditions"
+            ],
+            "history": "The Zulu people emerged as a powerful nation under King Shaka in the early 19th century. They developed sophisticated military tactics and social organization.",
+            "traditions": [
+                "Traditional wedding ceremonies (Umabo)",
+                "Coming-of-age ceremonies",
+                "Traditional healing practices",
+                "Cattle ceremonies and rituals",
+                "Traditional clothing with animal skins",
+                "Warrior training and traditions"
+            ]
+        }
     }
 }
 
@@ -469,8 +554,89 @@ African art and music are not just for entertainment - they are ways of communic
 
 Would you like to learn more about any specific art form or musical tradition?"""
 
+    # Check for ethnic groups
+    elif any(word in input_lower for word in ["mandinka", "mandingo", "mandinka tribe"]):
+        tribe_info = CULTURAL_KNOWLEDGE["ethnic_groups"]["mandinka"]
+        return f"""Ah, the Mandinka people! Let me share with you the rich culture and traditions of this remarkable ethnic group...
+
+The **{tribe_info['name']}** are one of the largest ethnic groups in West Africa, with over {tribe_info['population']}. They are found across {tribe_info['location']} and speak {tribe_info['language']}.
+
+**Cultural Traditions:**
+{', '.join(tribe_info['culture'])}
+
+**History:**
+{tribe_info['history']}
+
+**Traditional Practices:**
+{', '.join(tribe_info['traditions'])}
+
+**Core Values:**
+{', '.join(tribe_info['values'])}
+
+**Famous Mandinka Figures:**
+{', '.join(tribe_info['famous_figures'])}
+
+The Mandinka people have preserved their rich cultural heritage through generations, maintaining their traditions while adapting to modern times. Their emphasis on community, respect for elders, and preservation of oral history through griots makes them a shining example of African cultural resilience.
+
+Would you like to learn more about Mandinka music and instruments, their traditional ceremonies, or the role of griots in their society?"""
+
+    elif any(word in input_lower for word in ["yoruba", "yoruba tribe", "yoruba people"]):
+        tribe_info = CULTURAL_KNOWLEDGE["ethnic_groups"]["yoruba"]
+        return f"""Ah, the Yoruba people! Let me share with you the fascinating culture and traditions of this ancient ethnic group...
+
+The **{tribe_info['name']}** are one of Africa's largest ethnic groups, with over {tribe_info['population']}. They are primarily found in {tribe_info['location']} and speak {tribe_info['language']}.
+
+**Cultural Traditions:**
+{', '.join(tribe_info['culture'])}
+
+**History:**
+{tribe_info['history']}
+
+**Traditional Practices:**
+{', '.join(tribe_info['traditions'])}
+
+The Yoruba people have one of the most sophisticated cultural systems in Africa, with rich artistic traditions, complex religious beliefs, and a strong emphasis on education and learning.
+
+Would you like to learn more about Yoruba art and beadwork, their religious traditions, or their traditional festivals?"""
+
+    elif any(word in input_lower for word in ["zulu", "zulu tribe", "zulu people"]):
+        tribe_info = CULTURAL_KNOWLEDGE["ethnic_groups"]["zulu"]
+        return f"""Ah, the Zulu people! Let me share with you the proud culture and traditions of this remarkable ethnic group...
+
+The **{tribe_info['name']}** are one of South Africa's largest ethnic groups, with over {tribe_info['population']}. They are primarily found in {tribe_info['location']} and speak {tribe_info['language']}.
+
+**Cultural Traditions:**
+{', '.join(tribe_info['culture'])}
+
+**History:**
+{tribe_info['history']}
+
+**Traditional Practices:**
+{', '.join(tribe_info['traditions'])}
+
+The Zulu people are known for their warrior traditions, rich cultural heritage, and strong sense of community. Their traditional music, dance, and beadwork continue to inspire people around the world.
+
+Would you like to learn more about Zulu warrior traditions, their traditional music and dance, or their cattle-herding customs?"""
+
     # Default response with cultural warmth
     default_responses = FALLBACK_RESPONSES["default"]
+    
+    # Check if the query seems to be about a specific person or place
+    if any(word in input_lower for word in ["who is", "tell me about", "what is"]):
+        return f"""Ah, my child, I understand you're asking about something specific. While I may not have detailed information about that particular topic, let me share some related African wisdom with you...
+
+{random.choice(default_responses)}
+
+I can help you learn about:
+- **African historical figures** like Sundiata Keita, Mansa Musa, or Sir Dawda Jawara
+- **African ethnic groups** like the Mandinka, Yoruba, or Zulu people
+- **African empires** like Mali, Ghana, or Songhai
+- **African philosophy** like Ubuntu
+- **African traditions** like griot storytelling
+- **African proverbs and wisdom**
+
+What would you like to explore about African culture, history, or wisdom?"""
+    
     return f"{random.choice(default_responses)} I am here to share the wisdom of our ancestors and help you learn about the rich cultural heritage of Africa. What specific aspect of African culture, history, or wisdom would you like to explore?"
 
 def generate_response(prompt):
