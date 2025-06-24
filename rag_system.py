@@ -604,9 +604,11 @@ def get_rag_response(query, chat_history=None):
             if len(cleaned_response) < 100 or "i am here to share" in cleaned_response.lower():
                 # Generate a more focused response
                 try:
+                    from model import model
                     improved_response = model.generate(focused_prompt, max_length=400, temperature=0.7, do_sample=True)
                     return clean_response(improved_response.strip())
-                except:
+                except Exception as e:
+                    st.warning(f"Could not improve RAG response: {str(e)}")
                     return cleaned_response
             
             return cleaned_response

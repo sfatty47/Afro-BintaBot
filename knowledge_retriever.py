@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import streamlit as st
 import re
 import time
+from typing import Dict, List, Optional
 
 # Configure Wikipedia for African content
 wikipedia.set_lang("en")
@@ -130,18 +131,66 @@ def get_wikipedia_content(topic):
         st.warning(f"Wikipedia error: {str(e)}")
         return None
 
+def search_wikipedia(query: str, max_results: int = 3) -> List[Dict]:
+    """
+    Search Wikipedia for African-related content with proper error handling
+    """
+    try:
+        # Simple Wikipedia search using the API
+        search_url = "https://en.wikipedia.org/w/api.php"
+        params = {
+            "action": "query",
+            "format": "json",
+            "list": "search",
+            "srsearch": f"{query} Africa",
+            "srlimit": max_results
+        }
+        
+        response = requests.get(search_url, params=params, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        results = []
+        
+        if "query" in data and "search" in data["query"]:
+            for item in data["query"]["search"]:
+                results.append({
+                    "title": item["title"],
+                    "snippet": item["snippet"],
+                    "url": f"https://en.wikipedia.org/wiki/{item['title'].replace(' ', '_')}"
+                })
+        
+        return results
+        
+    except Exception as e:
+        st.warning(f"Could not search Wikipedia: {str(e)}")
+        return []
+
+def search_web(query: str, max_results: int = 3) -> List[Dict]:
+    """
+    Simple web search with proper error handling
+    """
+    try:
+        # For now, return empty results to avoid external dependencies
+        # In production, you could use DuckDuckGo, SerpAPI, or other search services
+        return []
+        
+    except Exception as e:
+        st.warning(f"Could not search web: {str(e)}")
+        return []
+
 def get_enhanced_african_knowledge(query, max_results=5):
     """
-    Enhanced knowledge retrieval with better African content filtering
+    Enhanced knowledge retrieval with better African content filtering and error handling
     """
     try:
         # Clean and enhance the query for better African-focused results
         enhanced_query = enhance_query_for_africa(query)
         
-        # Get Wikipedia results
+        # Get Wikipedia results with error handling
         wiki_results = search_wikipedia(enhanced_query, max_results)
         
-        # Get web search results
+        # Get web search results with error handling
         web_results = search_web(enhanced_query, max_results)
         
         # Filter and combine results

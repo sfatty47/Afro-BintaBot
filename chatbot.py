@@ -98,6 +98,27 @@ def get_fallback_response(user_input):
         return fallback_responses["mali_empire"][0]
     elif "mansa musa" in user_input_lower:
         return fallback_responses["mansa_musa"][0]
+    elif any(word in user_input_lower for word in ['manjago', 'manjak', 'manjaku', 'manjack']):
+        return """Ah, let me share with you the story of the Manjago people...
+
+**The Manjago People:**
+The Manjago (also known as Manjak, Manjaku, or Manjack) are an ethnic group primarily found in Guinea-Bissau, Senegal, and The Gambia. They are part of the larger Bak ethnic group and speak Manjago, a language in the Niger-Congo family.
+
+**Cultural Traditions:**
+- **Agriculture**: Known for their rice farming and palm wine production
+- **Crafts**: Skilled in basket weaving, pottery, and traditional crafts
+- **Religion**: Traditional animist beliefs with some Christian and Muslim influences
+- **Social Structure**: Organized in extended family units with strong community bonds
+
+**Historical Background:**
+The Manjago people have lived in the Casamance region for centuries, maintaining their cultural identity despite colonial influences. They are known for their resilience and preservation of traditional practices.
+
+**Modern Life:**
+Today, the Manjago continue to practice their traditional customs while adapting to modern life. Many maintain their agricultural traditions and cultural ceremonies.
+
+As our elders say, 'Every people has their own wisdom, and every culture has its own beauty.' The Manjago people remind us of the rich diversity of African cultures and the importance of preserving traditional knowledge.
+
+Would you like to learn more about their traditional practices or their role in West African history?"""
     else:
         return fallback_responses["default"][0]
 
@@ -141,56 +162,61 @@ BintaBot:"""
         # Detect the topic for better response focus
         topic = detect_topic(user_input)
         
-        # First, try RAG system for better cultural responses
-        rag_response = get_rag_response(user_input, chat_history)
-        
-        # Check if RAG found relevant information (not just a generic response)
-        # Also check if the response actually matches the query
-        rag_is_relevant = (
-            rag_response and 
-            len(rag_response) > 50 and 
-            not any(word in rag_response.lower() for word in ["i am here to share", "what specific aspect", "help you learn"]) and
-            # Check if the response actually relates to the query
-            any(word in user_input.lower() for word in rag_response.lower()[:200])
-        )
-        
-        if rag_is_relevant:
-            response = clean_response(rag_response)
+        # First, try specific fallback responses for common topics
+        fallback_response = get_african_fallback_response(user_input)
+        if fallback_response:
+            response = clean_response(fallback_response)
         else:
-            # Try specific fallback responses for common topics
-            fallback_response = get_african_fallback_response(user_input)
-            if fallback_response:
-                response = clean_response(fallback_response)
-            else:
-                # Try knowledge retrieval system for online information
-                try:
-                    from knowledge_retriever import get_enhanced_african_knowledge, format_knowledge_response
-                    
-                    with st.spinner(f"🔍 Searching for information about {topic}..."):
-                        enhanced_knowledge = get_enhanced_african_knowledge(user_input)
-                    
-                    if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
-                        formatted_response = format_knowledge_response(enhanced_knowledge)
-                        if formatted_response:
-                            # Add cultural warmth to the response
-                            response = f"""Ah, my child, let me share with you what I have learned about {topic} from our collective knowledge...
+            # Try RAG system for better cultural responses
+            try:
+                rag_response = get_rag_response(user_input, chat_history)
+                
+                # Check if RAG found relevant information
+                rag_is_relevant = (
+                    rag_response and 
+                    len(rag_response) > 50 and 
+                    not any(word in rag_response.lower() for word in ["i am here to share", "what specific aspect", "help you learn"]) and
+                    # Check if the response actually relates to the query
+                    any(word in user_input.lower() for word in rag_response.lower()[:200])
+                )
+                
+                if rag_is_relevant:
+                    response = clean_response(rag_response)
+                else:
+                    # Try knowledge retrieval system for online information
+                    try:
+                        from knowledge_retriever import get_enhanced_african_knowledge, format_knowledge_response
+                        
+                        with st.spinner(f"🔍 Searching for information about {topic}..."):
+                            enhanced_knowledge = get_enhanced_african_knowledge(user_input)
+                        
+                        if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
+                            formatted_response = format_knowledge_response(enhanced_knowledge)
+                            if formatted_response:
+                                # Add cultural warmth to the response
+                                response = f"""Ah, my child, let me share with you what I have learned about {topic} from our collective knowledge...
 
 {formatted_response}
 
 As our elders say, 'Knowledge is like a garden: if it is not cultivated, it cannot be harvested.' Let us continue to learn and grow together.
 
 Would you like to explore more about {topic} or learn about related aspects of African culture?"""
-                            response = clean_response(response)
+                                response = clean_response(response)
+                            else:
+                                # Fall back to topic-aware model generation
+                                response = generate_response(user_input)
                         else:
                             # Fall back to topic-aware model generation
                             response = generate_response(user_input)
-                    else:
-                        # Fall back to topic-aware model generation
+                            
+                    except ImportError:
+                        # Knowledge retrieval not available, fall back to topic-aware model generation
                         response = generate_response(user_input)
                     
-                except ImportError:
-                    # Knowledge retrieval not available, fall back to topic-aware model generation
-                    response = generate_response(user_input)
+            except Exception as e:
+                st.warning(f"RAG system unavailable: {str(e)}")
+                # Fall back to topic-aware model generation
+                response = generate_response(user_input)
         
         # Post-process to ensure cultural warmth
         if response and not response.startswith("I am BintaBot"):
@@ -561,6 +587,54 @@ As our elders say, 'The past is a guide to the future.' Understanding our histor
 
 Would you like to learn about specific periods, empires, or historical figures?"""
 
+    # Specific ethnic groups and tribes
+    elif any(word in query_lower for word in ['manjago', 'manjak', 'manjaku', 'manjack']):
+        return """Ah, let me share with you the story of the Manjago people...
+
+**The Manjago People:**
+The Manjago (also known as Manjak, Manjaku, or Manjack) are an ethnic group primarily found in Guinea-Bissau, Senegal, and The Gambia. They are part of the larger Bak ethnic group and speak Manjago, a language in the Niger-Congo family.
+
+**Cultural Traditions:**
+- **Agriculture**: Known for their rice farming and palm wine production
+- **Crafts**: Skilled in basket weaving, pottery, and traditional crafts
+- **Religion**: Traditional animist beliefs with some Christian and Muslim influences
+- **Social Structure**: Organized in extended family units with strong community bonds
+
+**Historical Background:**
+The Manjago people have lived in the Casamance region for centuries, maintaining their cultural identity despite colonial influences. They are known for their resilience and preservation of traditional practices.
+
+**Modern Life:**
+Today, the Manjago continue to practice their traditional customs while adapting to modern life. Many maintain their agricultural traditions and cultural ceremonies.
+
+As our elders say, 'Every people has their own wisdom, and every culture has its own beauty.' The Manjago people remind us of the rich diversity of African cultures and the importance of preserving traditional knowledge.
+
+Would you like to learn more about their traditional practices or their role in West African history?"""
+
+    # General tribe/ethnic group queries
+    elif topic == "tribe" or any(word in query_lower for word in ['tribe', 'ethnic', 'people', 'group']):
+        return """Ah, let me share with you about the rich diversity of African ethnic groups...
+
+**The Diversity of African Peoples:**
+Africa is home to over 3,000 distinct ethnic groups, each with unique languages, traditions, and cultural practices. From the Berbers of North Africa to the Zulu of South Africa, from the Yoruba of West Africa to the Maasai of East Africa, our continent is a beautiful mosaic of cultures.
+
+**Common Cultural Elements:**
+- **Extended Family Systems**: Strong emphasis on family and community bonds
+- **Oral Traditions**: Storytelling, proverbs, and griots preserving history
+- **Traditional Practices**: Ceremonies, rituals, and cultural celebrations
+- **Respect for Elders**: Wisdom and experience highly valued
+- **Connection to Land**: Deep spiritual and cultural ties to ancestral territories
+
+**Modern Challenges and Adaptations:**
+While many ethnic groups maintain their traditional practices, they also adapt to modern life:
+- Preserving languages and cultural practices
+- Balancing tradition with contemporary needs
+- Sharing cultural knowledge with younger generations
+- Contributing to national and continental unity
+
+As our elders say, 'Unity in diversity is our strength.' Each ethnic group contributes to the rich tapestry of African culture and heritage.
+
+Would you like to learn about a specific ethnic group or their traditional practices?"""
+
     return None
 
 def clean_response(response):
@@ -598,20 +672,27 @@ def format_chat_history_for_context(chat_history, max_messages=4):
     if not chat_history or len(chat_history) < 2:
         return ""
     
-    # Get the last few exchanges
-    recent_history = chat_history[-max_messages:]
-    
-    context_parts = []
-    for i in range(0, len(recent_history), 2):
-        if i + 1 < len(recent_history):
-            user_msg = recent_history[i]
-            bot_msg = recent_history[i + 1]
-            context_parts.append(f"User: {user_msg}\nAssistant: {bot_msg[:100]}...")
-    
-    if context_parts:
-        return "\n\nRecent conversation:\n" + "\n".join(context_parts) + "\n\n"
-    
-    return ""
+    try:
+        # Get the last few exchanges
+        recent_history = chat_history[-max_messages:]
+        
+        context_parts = []
+        for i in range(0, len(recent_history), 2):
+            if i + 1 < len(recent_history):
+                user_msg = recent_history[i]
+                bot_msg = recent_history[i + 1]
+                # Safely truncate bot message
+                bot_preview = str(bot_msg)[:100] + "..." if len(str(bot_msg)) > 100 else str(bot_msg)
+                context_parts.append(f"User: {user_msg}\nAssistant: {bot_preview}")
+        
+        if context_parts:
+            return "\n\nRecent conversation:\n" + "\n".join(context_parts) + "\n\n"
+        
+        return ""
+        
+    except Exception as e:
+        st.warning(f"Could not format chat history: {str(e)}")
+        return ""
 
 def reflect_and_improve_response(raw_response, query, topic):
     """
@@ -657,20 +738,38 @@ def generate_response(prompt):
         # Detect the topic
         topic = detect_topic(prompt)
         
-        # Create focused prompt
-        focused_prompt = create_focused_prompt(prompt, topic, st.session_state.chat_history)
+        # Create focused prompt with strict instructions
+        focused_prompt = f"""{SYSTEM_PROMPT}
+
+**Topic Focus:** {topic.title()}
+**Current Question:** {prompt}
+
+**STRICT INSTRUCTIONS:**
+- Focus ONLY on the main topic of the question
+- Do NOT repeat the same fact more than once
+- Do NOT go off-topic or mention unrelated information
+- Keep the response concise and culturally warm
+- Use storytelling or proverbs when appropriate
+- End with an encouraging follow-up question
+
+**Response:**"""
         
         # Generate initial response
-        raw_response = model.generate(focused_prompt, max_length=512, temperature=0.7, do_sample=True)
+        raw_response = model.generate(focused_prompt, max_length=300, temperature=0.7, do_sample=True)
         
-        # Reflect and improve the response
-        improved_response = reflect_and_improve_response(raw_response, prompt, topic)
+        # Clean and deduplicate the response
+        cleaned_response = clean_response(raw_response)
         
-        return improved_response
+        # If response is too short or generic, try reflection
+        if len(cleaned_response) < 50:
+            improved_response = reflect_and_improve_response(cleaned_response, prompt, topic)
+            return improved_response
+        
+        return cleaned_response
         
     except Exception as e:
         st.error(f"Error generating response: {str(e)}")
-        return "I apologize, but I'm having trouble generating a response right now. Please try again."
+        return "Ah, my child, that topic is not yet in my memory. But I will seek it soon. For now, let us speak of what we know — or you may help me learn!"
 
 def detect_topic(query):
     """
