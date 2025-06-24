@@ -91,7 +91,13 @@ CULTURAL_KNOWLEDGE = {
             "location": "Present-day Mali and Mauritania",
             "wealth": "Known as the 'Land of Gold'",
             "trade": "Controlled trans-Saharan trade routes",
-            "significance": "One of the first major West African empires, setting the foundation for later kingdoms."
+            "significance": "One of the first major West African empires, setting the foundation for later kingdoms.",
+            "achievements": [
+                "First major West African empire",
+                "Controlled trans-Saharan gold trade",
+                "Established trade routes across the Sahara",
+                "Known as the 'Land of Gold' for its wealth"
+            ]
         },
         "songhai": {
             "period": "1464-1591 CE",

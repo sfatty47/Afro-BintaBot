@@ -72,14 +72,27 @@ class AfricanRAGSystem:
                     "topic": empire_name,
                     "category": "history",
                     "keywords": [empire_name, "empire", "period", "history"]
-                },
-                {
+                }
+            ])
+            
+            # Add achievements chunk only if it exists
+            if 'achievements' in empire_info:
+                chunks.append({
                     "content": f"{empire_name.title()} Empire achievements: {', '.join(empire_info['achievements'])}",
                     "topic": empire_name,
                     "category": "history",
                     "keywords": [empire_name, "empire", "achievements", "history"]
-                }
-            ])
+                })
+            
+            # Add other available information
+            for key, value in empire_info.items():
+                if key not in ['period', 'achievements'] and isinstance(value, str):
+                    chunks.append({
+                        "content": f"{empire_name.title()} Empire {key}: {value}",
+                        "topic": empire_name,
+                        "category": "history",
+                        "keywords": [empire_name, "empire", key, "history"]
+                    })
         
         # Language chunks
         lang_info = CULTURAL_KNOWLEDGE["languages"]
@@ -252,11 +265,32 @@ Would you like to hear a story that has been passed down through the generations
         """Generate empire-specific response"""
         empire_info = CULTURAL_KNOWLEDGE["empires"][empire_name]
         
+        # Build empire description dynamically
+        empire_desc = f"The {empire_name.title()} Empire"
+        
+        if 'period' in empire_info:
+            empire_desc += f" ({empire_info['period']})"
+        
+        if 'location' in empire_info:
+            empire_desc += f" was located in {empire_info['location']}"
+        elif 'capital' in empire_info:
+            empire_desc += f" had its capital at {empire_info['capital']}"
+        
+        if 'achievements' in empire_info:
+            achievements_text = f"Key achievements included: {', '.join(empire_info['achievements'])}"
+        else:
+            # Use other available information
+            other_info = []
+            for key, value in empire_info.items():
+                if key not in ['period', 'achievements'] and isinstance(value, str):
+                    other_info.append(f"{key}: {value}")
+            achievements_text = f"Notable features: {', '.join(other_info)}" if other_info else "was a significant African empire"
+        
         return f"""Ah, the great {empire_name.title()} Empire! Let me share with you the stories of this magnificent kingdom that once ruled the lands of Africa...
 
 {context}
 
-The {empire_name.title()} Empire was a testament to the greatness of African civilization. Our ancestors built kingdoms that rivaled any in the world, demonstrating wisdom, power, and cultural achievement.
+{empire_desc}. {achievements_text}
 
 These empires show us that Africa has always been a land of great civilizations, wisdom, and achievement. Our ancestors built kingdoms that rivaled any in the world!
 
