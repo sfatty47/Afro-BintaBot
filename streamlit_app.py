@@ -1,5 +1,6 @@
 import streamlit as st
 from chatbot import culturally_aware_chat
+from model import get_model, get_tokenizer
 
 # Page configuration
 st.set_page_config(
@@ -40,8 +41,24 @@ st.markdown("""
         color: white;
         margin: 0.5rem 0;
     }
+    .status-box {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+        border-left: 4px solid #ff8c42;
+    }
 </style>
 """, unsafe_allow_html=True)
+
+def check_model_status():
+    """Check if model and tokenizer are loaded"""
+    try:
+        tokenizer = get_tokenizer()
+        model = get_model()
+        return tokenizer is not None and model is not None
+    except:
+        return False
 
 def main():
     # Header
@@ -51,6 +68,16 @@ def main():
         <p><em>Wisdom from the heart of Africa</em></p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Model status indicator
+    if not check_model_status():
+        st.markdown("""
+        <div class="status-box">
+            <h4>🔄 Loading BintaBot's Wisdom...</h4>
+            <p>BintaBot is loading her knowledge of African culture, history, and wisdom. This may take a moment on first startup.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.info("💡 Tip: If loading takes too long, try refreshing the page.")
     
     # Sidebar
     st.sidebar.header("🌍 About BintaBot")
