@@ -1,253 +1,160 @@
 # 🌍 BintaBot - African Cultural Assistant
 
-A culturally-aware African chatbot with deep knowledge of African traditions, proverbs, and wisdom.
+BintaBot is a culturally-aware African chatbot that combines traditional wisdom with modern learning capabilities. She can learn from extensive online materials about Africa, providing accurate, comprehensive, and culturally-grounded responses.
 
-## 🌟 Features
+## ✨ Features
 
-- **Cultural Wisdom**: Responses grounded in African traditions, proverbs, and values
-- **Text Chat**: Rich conversation about African culture and history
-- **Multiple Interfaces**: Command-line, Streamlit UI, and FastAPI endpoints
-- **Cloud Deployment**: Ready for Streamlit Cloud deployment
-- **Local Voice Features**: Voice input/output available in local development
+### 🧠 Enhanced Learning System
+- **Real-time Knowledge Retrieval**: Searches Wikipedia and current online sources
+- **Academic Integration**: Pulls from reliable academic sources about Africa
+- **Comprehensive Coverage**: Covers history, culture, philosophy, geography, and more
+- **Factual Accuracy**: Prevents hallucination with verified information
 
-## 🚀 Quick Start - Streamlit Cloud
+### 🌟 Cultural Intelligence
+- **Ancient African Empires**: Mali, Ghana, Songhai, and more
+- **Oral Traditions**: Griot storytelling and wisdom
+- **Philosophy**: Ubuntu and African community values
+- **Proverbs & Wisdom**: Traditional African sayings and teachings
+- **Cultural Greetings**: Authentic African ways of connecting
 
-### Deploy to Streamlit Cloud (Recommended)
+### 🎯 Smart Response System
+- **Context-Aware**: Understands cultural nuances
+- **Multi-Source Learning**: Combines built-in knowledge with online research
+- **Fallback Protection**: Graceful degradation when online sources unavailable
+- **Timeout Handling**: Fast responses even with complex queries
 
-1. **Fork this repository** to your GitHub account
-2. **Go to [Streamlit Cloud](https://streamlit.io/cloud)**
-3. **Sign in** with your GitHub account
-4. **Click "New app"**
-5. **Select your forked repository**
-6. **Set the main file path**: `streamlit_app.py`
-7. **Add Hugging Face Token** (see setup below)
-8. **Click "Deploy"**
+## 🚀 Quick Start
 
-Your BintaBot will be live in minutes! 🌍
+### Cloud Version (Recommended)
+1. Visit the Streamlit Cloud deployment
+2. Start chatting with BintaBot about African culture
+3. Experience enhanced learning from online materials
 
-### 🔑 Hugging Face Token Setup
-
-BintaBot uses the Mistral-7B model which requires authentication. To set up your token:
-
-1. **Get a Hugging Face Token:**
-   - Go to [Hugging Face](https://huggingface.co/settings/tokens)
-   - Sign in or create an account
-   - Click "New token"
-   - Give it a name (e.g., "BintaBot")
-   - Select "Read" permissions
-   - Copy the token
-
-2. **Add Token to Streamlit Cloud:**
-   - In your Streamlit Cloud app settings
-   - Go to "Secrets" section
-   - Add this configuration:
-   ```toml
-   HF_TOKEN = "your_hugging_face_token_here"
-   ```
-
-3. **Alternative: Use Fallback Model**
-   - If you don't want to set up a token, the app will automatically use a fallback model
-   - The fallback model is open-access and doesn't require authentication
-   - You'll still get cultural responses, though they may be less sophisticated
-
-**Note**: The cloud version focuses on text-based cultural exchange. Voice features are available in the local version.
-
-### Local Development (Full Features)
-
-1. **Clone and setup environment:**
+### Local Installation
 ```bash
+# Clone the repository
+git clone <repository-url>
 cd fatoubot
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-2. **Install dependencies:**
-```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Run the Streamlit app
+streamlit run streamlit_app.py
 ```
 
-3. **Install system dependencies (macOS):**
-```bash
-# Install portaudio for microphone access
-brew install portaudio
+## 📚 Knowledge Sources
 
-# Install cmake (if needed)
-brew install cmake
-```
+BintaBot learns from multiple sources:
 
-4. **Set up Hugging Face Token (Optional):**
-   - Create `.streamlit/secrets.toml` file
-   - Add: `HF_TOKEN = "your_token_here"`
-   - This enables the full Mistral-7B model locally
+### 🔍 Online Learning
+- **Wikipedia**: Academic information about African topics
+- **DuckDuckGo Search**: Current information and news
+- **Cultural Databases**: African history and traditions
+- **Academic Sources**: Scholarly articles and research
 
-## 🛠️ Usage
+### 📖 Built-in Knowledge
+- **Historical Empires**: Detailed information about Mali, Ghana, Songhai
+- **Cultural Figures**: Sundiata Keita, Mansa Musa, and more
+- **Philosophical Traditions**: Ubuntu and African wisdom
+- **Oral Traditions**: Griot storytelling and proverbs
 
-### 1. Streamlit Cloud (Text Only)
-- Visit your deployed app URL
-- Type messages in chat box
-- Ask about African wisdom, stories, or culture
-- Perfect for sharing cultural knowledge
+## 🎓 Learning Categories
 
-### 2. Local Development (Full Features)
+### History
+- African empires and kingdoms
+- Trans-Saharan trade routes
+- Colonial history and independence movements
+- Ancient civilizations
 
-#### Voice Chat (Command Line)
-```bash
-python voice_chatbot.py
-```
-- Choose between voice input, text input, or quit
-- Voice responses are automatic
-- Simple and intuitive interface
+### Culture
+- Traditional religions and beliefs
+- Music, dance, and art
+- Languages and literature
+- Festivals and celebrations
 
-#### Streamlit Voice UI (Local)
-```bash
-streamlit run voice_ui.py
-```
-- Beautiful web interface with voice controls
-- Sidebar for voice input button
-- Chat history with voice response options
-- Real-time speech recognition
+### Philosophy
+- Ubuntu philosophy
+- Community values
+- Moral teachings
+- Traditional wisdom
 
-#### FastAPI Backend
-```bash
-uvicorn api:app --reload
-```
-- RESTful API endpoints
-- Voice chat endpoint: `/voice/chat`
-- Speech-to-text endpoint: `/voice/speech-to-text`
-- Text chat endpoint: `/chat`
+### Geography
+- African landscapes and climate
+- Natural resources
+- Wildlife and ecosystems
+- Cities and landmarks
 
-#### Simple Text UI
-```bash
-streamlit run chatbot_ui.py
-```
-- Basic text-only interface
-- No voice capabilities
+## 💬 Example Conversations
 
-## 🎤 Voice Features (Local Only)
+**User**: "Tell me about Sundiata Keita"
+**BintaBot**: *Searches online sources and provides comprehensive information about the founder of the Mali Empire, including his childhood, battles, and legacy*
 
-### Speech Recognition
-- Uses Google's speech recognition API
-- Automatic noise adjustment
-- 5-second timeout with 10-second phrase limit
-- Supports multiple languages
+**User**: "What is Ubuntu philosophy?"
+**BintaBot**: *Explains the Nguni Bantu concept of interconnectedness and community*
 
-### Text-to-Speech
-- Female voice optimized for BintaBot
-- Adjustable speech rate (150 WPM)
-- Volume control (90%)
-- Asynchronous speech for non-blocking operation
+**User**: "Share an African proverb"
+**BintaBot**: *Shares traditional wisdom like "It takes a village to raise a child" with cultural context*
 
-## 📁 Project Structure
+## 🔧 Technical Architecture
 
-```
-fatoubot/
-├── streamlit_app.py      # Main app for Streamlit Cloud deployment (text-only)
-├── model.py              # Mistral-7B model loading with fallback
-├── chatbot.py            # Core chat logic with BintaBot prompt
-├── voice_utils.py        # Voice recognition and TTS utilities (local)
-├── voice_chatbot.py      # Command-line voice interface (local)
-├── voice_ui.py           # Streamlit voice interface (local)
-├── chatbot_ui.py         # Basic text interface
-├── api.py                # FastAPI backend with voice endpoints (local)
-├── requirements.txt      # Python dependencies
-├── .streamlit/           # Streamlit configuration
-│   ├── config.toml
-│   └── secrets.toml      # Hugging Face token (local only)
-└── README.md            # This file
-```
+### Model System
+- **Primary**: Mistral-7B-Instruct-v0.2 (with Hugging Face authentication)
+- **Fallback**: DialoGPT-medium (open access)
+- **Knowledge Retrieval**: Wikipedia + DuckDuckGo integration
 
-## 🔧 API Endpoints (Local)
+### Response Generation
+1. **Online Search**: Query online sources for current information
+2. **Knowledge Integration**: Combine with built-in cultural knowledge
+3. **Context Analysis**: Apply cultural understanding
+4. **Response Generation**: Create culturally-aware responses
 
-### Text Chat
-```bash
-POST /chat
-{
-  "message": "Hello BintaBot"
-}
-```
+### Error Handling
+- **Timeout Protection**: 30-second generation limits
+- **Fallback Responses**: Cultural knowledge when models fail
+- **Graceful Degradation**: Maintains functionality with partial failures
 
-### Voice Chat
-```bash
-POST /voice/chat
-{
-  "message": "Tell me a proverb"
-}
-```
-Returns both text response and audio data.
+## 🌐 Deployment
 
-### Speech-to-Text
-```bash
-POST /voice/speech-to-text
-# Upload audio file (WAV format)
-```
+### Streamlit Cloud
+- Text-based interface with enhanced learning
+- Real-time knowledge retrieval
+- Responsive design
+- No voice features (cloud limitations)
 
-## 🎯 Quick Commands
+### Local Development
+- Full voice capabilities
+- Complete feature set
+- Offline knowledge base
+- Customizable configuration
 
-- **"Tell me a story"** - Request African folktale
-- **"Share wisdom"** - Request African proverb
-- **"How is the family?"** - Cultural greeting
-- **"Tell me about Ubuntu"** - Learn about African philosophy
-- **"What is a griot?"** - Learn about oral tradition
-- **"Share an African proverb"** - Get wisdom from ancestors
+## 🔐 Security & Privacy
 
-## 🌍 Cultural Context
-
-BintaBot is designed with deep knowledge of:
-- Ancient African empires (Mali, Ghana, Songhai)
-- Oral storytelling traditions (Griots)
-- Community philosophies (Ubuntu)
-- African proverbs and folk wisdom
-- Cultural greetings and customs
-
-## 🐛 Troubleshooting
-
-### Streamlit Cloud Issues
-- **Model Loading Errors**: Check if Hugging Face token is properly set in secrets
-- **Fallback Model**: If Mistral-7B fails, the app automatically uses DialoGPT-medium
-- **Voice features are not available** in cloud environment
-- **Text chat will always work** with fallback responses
-- Check deployment logs for errors
-- Ensure all dependencies are properly specified
-
-### Hugging Face Token Issues
-- **Token not working**: Ensure token has "Read" permissions
-- **Model access denied**: Accept the model terms on Hugging Face website
-- **Token expired**: Generate a new token
-- **Fallback mode**: The app will work with open-access models if token fails
-
-### Local Voice Issues
-- Ensure microphone permissions are granted
-- Check if microphone is connected and working
-- Try different microphone if available
-- Install system dependencies (portaudio, cmake)
-
-### Speech Recognition Errors
-- Speak clearly and at normal volume
-- Reduce background noise
-- Check internet connection (Google API required)
-
-### Text-to-Speech Issues
-- Ensure speakers/headphones are connected
-- Check system volume
-- Try different voice settings in voice_utils.py
-
-### Installation Issues
-- Update pip: `pip install --upgrade pip`
-- Install system dependencies (portaudio, cmake)
-- Use virtual environment to avoid conflicts
+- **No Data Storage**: Conversations are not stored
+- **Secure Authentication**: Hugging Face tokens via Streamlit secrets
+- **Privacy-First**: No personal information collection
+- **Open Source**: Transparent and auditable code
 
 ## 🤝 Contributing
 
-Feel free to contribute by:
-- Adding more African proverbs and wisdom
-- Improving voice recognition accuracy
-- Enhancing the cultural knowledge base
-- Adding support for African languages
+We welcome contributions to enhance BintaBot's knowledge and capabilities:
+
+1. **Knowledge Expansion**: Add more cultural content
+2. **Source Integration**: Connect additional reliable sources
+3. **Language Support**: Add more African languages
+4. **Feature Development**: Enhance learning algorithms
 
 ## 📄 License
 
 This project is open source and available under the MIT License.
 
+## 🙏 Acknowledgments
+
+- African griots and oral tradition keepers
+- Academic researchers of African history and culture
+- Open source community for tools and libraries
+- Cultural experts who preserve African wisdom
+
 ---
 
-*"Wisdom is like a baobab tree; no one individual can embrace it."* - African Proverb 
+*BintaBot: "I am because we are" - Learning and sharing the wisdom of Africa together.* 🌍 

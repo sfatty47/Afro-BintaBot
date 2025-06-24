@@ -2,6 +2,13 @@ import streamlit as st
 from chatbot import culturally_aware_chat
 from model import get_model, get_tokenizer
 
+# Import knowledge retrieval if available
+try:
+    from knowledge_retriever import get_african_topic_suggestions
+    KNOWLEDGE_RETRIEVAL_AVAILABLE = True
+except ImportError:
+    KNOWLEDGE_RETRIEVAL_AVAILABLE = False
+
 # Page configuration
 st.set_page_config(
     page_title="BintaBot - African Cultural Assistant",
@@ -48,6 +55,13 @@ st.markdown("""
         margin: 1rem 0;
         border-left: 4px solid #ff8c42;
     }
+    .knowledge-box {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+        border-left: 4px solid #00bcd4;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -65,7 +79,7 @@ def main():
     st.markdown("""
     <div class="main-header">
         <h1>🌍 BintaBot - African Cultural Assistant</h1>
-        <p><em>Wisdom from the heart of Africa</em></p>
+        <p><em>Wisdom from the heart of Africa, enhanced with real-time learning</em></p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -79,6 +93,17 @@ def main():
         """, unsafe_allow_html=True)
         st.info("💡 Tip: If loading takes too long, try refreshing the page.")
     
+    # Knowledge retrieval status
+    if KNOWLEDGE_RETRIEVAL_AVAILABLE:
+        st.markdown("""
+        <div class="knowledge-box">
+            <h4>🔍 Enhanced Learning Active</h4>
+            <p>BintaBot can now search and learn from online materials about Africa, including Wikipedia and current sources!</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.warning("⚠️ Knowledge retrieval system not available. Using built-in knowledge only.")
+    
     # Sidebar
     st.sidebar.header("🌍 About BintaBot")
     st.sidebar.markdown("""
@@ -91,6 +116,14 @@ def main():
     - Cultural greetings and customs
     """)
     
+    # Enhanced features section
+    if KNOWLEDGE_RETRIEVAL_AVAILABLE:
+        st.sidebar.markdown("### 🔍 Enhanced Features:")
+        st.sidebar.markdown("- **Real-time learning** from online sources")
+        st.sidebar.markdown("- **Wikipedia integration** for academic information")
+        st.sidebar.markdown("- **Current information** about Africa")
+        st.sidebar.markdown("- **Comprehensive knowledge** base")
+    
     # Quick commands
     st.sidebar.markdown("### 💡 Quick Commands:")
     st.sidebar.markdown("- 'Tell me a story'")
@@ -99,6 +132,14 @@ def main():
     st.sidebar.markdown("- 'Tell me about Ubuntu'")
     st.sidebar.markdown("- 'What is a griot?'")
     st.sidebar.markdown("- 'Share an African proverb'")
+    
+    # Advanced learning suggestions
+    if KNOWLEDGE_RETRIEVAL_AVAILABLE:
+        st.sidebar.markdown("### 🎓 Advanced Learning:")
+        st.sidebar.markdown("- 'Tell me about modern African art'")
+        st.sidebar.markdown("- 'What are African independence movements?'")
+        st.sidebar.markdown("- 'Tell me about African geography'")
+        st.sidebar.markdown("- 'What are African traditional religions?'")
     
     # Clear chat button
     if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
@@ -147,10 +188,17 @@ def main():
     - **Philosophy**: Understand Ubuntu and more
     """)
     
+    if KNOWLEDGE_RETRIEVAL_AVAILABLE:
+        st.sidebar.markdown("""
+    - **Real-time Learning**: Current information
+    - **Academic Sources**: Wikipedia integration
+    - **Comprehensive Knowledge**: Extensive coverage
+        """)
+    
     # Note about voice features
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 📝 Note")
-    st.sidebar.markdown("Voice features are available in the local version. This cloud version focuses on text-based cultural exchange.")
+    st.sidebar.markdown("Voice features are available in the local version. This cloud version focuses on text-based cultural exchange with enhanced learning capabilities.")
 
 if __name__ == "__main__":
     main() 
