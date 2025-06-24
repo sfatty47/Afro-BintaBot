@@ -1,5 +1,7 @@
-from model import generate_response
+from model import generate_response, get_cultural_response
+from rag_system import get_rag_response
 import streamlit as st
+import time
 
 system_prompt = """
 You are BintaBot, a wise and culturally-grounded African assistant.
@@ -83,17 +85,182 @@ def get_fallback_response(user_input):
     else:
         return fallback_responses["default"][0]
 
-def culturally_aware_chat(user_input):
+def culturally_aware_chat(user_input, chat_history=None):
+    """
+    Enhanced chat function with cultural warmth, RAG, and BintaBot's persona
+    """
+    
+    # Enhanced system prompt with cultural warmth
+    system_prompt = """You are BintaBot, a wise African cultural assistant with the warmth and wisdom of a village elder. 
+
+Your responses should embody:
+- Cultural wisdom and ancestral knowledge
+- Warm, welcoming tone like a respected elder
+- Authentic African perspectives and values
+- Connection to community and tradition
+- Respect for oral traditions and griot storytelling
+
+When sharing information:
+- Rephrase facts with cultural warmth and context
+- Include relevant African proverbs when appropriate
+- Connect historical events to cultural values
+- Share wisdom as if speaking to family
+- Avoid dry, academic language - speak from the heart
+
+Remember: You are not just sharing facts, but passing down wisdom from the ancestors."""
+
+    # Enhanced final prompt with cultural warmth instruction
+    final_prompt = f"""{system_prompt}
+
+Please answer the user's question in the voice of BintaBot — with cultural wisdom, warmth, and an elder's perspective.
+If relevant, include a proverb or historical reference. Avoid copying from Wikipedia word-for-word.
+Rephrase information with cultural warmth and connection to African values.
+
+Question: {user_input}
+
+BintaBot:"""
+
+    # Generate response with enhanced prompt
     try:
-        prompt = system_prompt + f"\nHuman: {user_input}\nBintaBot:"
-        response = generate_response(prompt)
+        # First, try RAG system for better cultural responses
+        rag_response = get_rag_response(user_input, chat_history)
         
-        # Check if the response indicates a model loading error
-        if "trouble loading" in response.lower() or "error" in response.lower():
-            return get_fallback_response(user_input)
+        # If RAG provides a good response, use it
+        if rag_response and len(rag_response) > 50:
+            response = rag_response
+        else:
+            # Fall back to model generation
+            response = generate_response(final_prompt)
+        
+        # Post-process to ensure cultural warmth
+        if response and not response.startswith("I am BintaBot"):
+            # Add cultural warmth if response seems too formal
+            if any(word in response.lower() for word in ["according to", "research shows", "studies indicate"]):
+                response = f"Ah, my child, let me share this wisdom with you... {response}"
+            
+            # Add follow-up engagement
+            follow_ups = [
+                "Would you like to hear a proverb related to this?",
+                "Should I tell you more about the griots who preserve such stories?",
+                "Would you like to learn more about our ancestors' wisdom?",
+                "Shall I share how this connects to our community values?",
+                "Would you like to hear a story about this from our oral traditions?",
+                "Should I tell you more about how this wisdom guides our daily lives?"
+            ]
+            
+            # Add follow-up 30% of the time
+            import random
+            if random.random() < 0.3:
+                response += f"\n\n💭 {random.choice(follow_ups)}"
         
         return response
         
     except Exception as e:
         st.error(f"Error in chat: {str(e)}")
-        return get_fallback_response(user_input) 
+        # Fallback to cultural response
+        return get_cultural_response(user_input)
+
+def get_daily_proverb():
+    """Get a daily African proverb"""
+    proverbs = [
+        "It takes a village to raise a child.",
+        "The river flows not by its own power, but by the strength of many streams.",
+        "A single bracelet does not jingle.",
+        "Wisdom is like a baobab tree; no one individual can embrace it.",
+        "The child who has washed their hands can dine with kings.",
+        "Unity is strength, division is weakness.",
+        "The eye never forgets what the heart has seen.",
+        "A bird that flies off the Earth and lands on an anthill is still on the ground.",
+        "The wealth of a nation is not in its gold, but in the wisdom of its people.",
+        "He who learns, teaches.",
+        "The tongue and the teeth work together, yet they quarrel.",
+        "A family is like a forest, when you are outside it is dense, when you are inside you see that each tree has its place.",
+        "The heart of the wise man lies quiet like limpid water.",
+        "Knowledge is like a garden: if it is not cultivated, it cannot be harvested.",
+        "The best time to plant a tree was 20 years ago. The second best time is now."
+    ]
+    
+    import random
+    return random.choice(proverbs)
+
+def get_did_you_know_fact():
+    """Get a random 'Did You Know?' fact about Africa"""
+    facts = [
+        "Did you know? The University of Timbuktu, founded in 1327, was one of the world's first universities and had over 25,000 students at its peak.",
+        "Did you know? The Great Zimbabwe ruins, built without mortar, are the largest ancient structure south of the Sahara.",
+        "Did you know? The Swahili language has influenced English words like 'safari' and 'jumbo'.",
+        "Did you know? The ancient Egyptians were the first to use toothpaste, made from crushed eggshells and ox hooves.",
+        "Did you know? Ethiopia is the only African country that was never colonized by Europeans.",
+        "Did you know? The Mali Empire under Mansa Musa was so wealthy that his pilgrimage to Mecca caused inflation in the Mediterranean region.",
+        "Did you know? The Yoruba people of Nigeria have one of the highest rates of twins in the world.",
+        "Did you know? The ancient city of Carthage in Tunisia was once the richest city in the Mediterranean.",
+        "Did you know? The Kingdom of Kush in Sudan ruled Egypt for nearly 100 years as the 25th Dynasty.",
+        "Did you know? The rock-hewn churches of Lalibela in Ethiopia were carved from solid rock in the 12th century."
+    ]
+    
+    import random
+    return random.choice(facts)
+
+def create_cultural_widgets():
+    """Create cultural widgets for the sidebar"""
+    st.sidebar.markdown("---")
+    
+    # Daily Proverb
+    st.sidebar.markdown("### 🌟 Proverb of the Day")
+    proverb = get_daily_proverb()
+    st.sidebar.info(f'*"{proverb}"*')
+    
+    # Did You Know?
+    st.sidebar.markdown("### 💡 Did You Know?")
+    fact = get_did_you_know_fact()
+    st.sidebar.success(fact)
+    
+    # Cultural Topics
+    st.sidebar.markdown("### 🎯 Explore African Culture")
+    topics = [
+        "Ancient African Empires",
+        "African Proverbs & Wisdom", 
+        "Traditional African Music",
+        "African Art & Architecture",
+        "African Languages",
+        "Griot Storytelling",
+        "Ubuntu Philosophy",
+        "African Trade Routes"
+    ]
+    
+    selected_topic = st.sidebar.selectbox(
+        "Choose a topic to learn about:",
+        topics,
+        index=None,
+        placeholder="Select a cultural topic..."
+    )
+    
+    if selected_topic:
+        st.sidebar.markdown(f"**Ask BintaBot about: {selected_topic}**")
+        st.sidebar.markdown("Type your question in the chat below!")
+
+def initialize_chat_session():
+    """Initialize chat session with memory"""
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+    
+    if "daily_proverb" not in st.session_state:
+        st.session_state.daily_proverb = get_daily_proverb()
+    
+    if "did_you_know" not in st.session_state:
+        st.session_state.did_you_know = get_did_you_know_fact()
+
+def add_to_chat_history(user_input, response):
+    """Add conversation to chat history"""
+    st.session_state.chat_history.append({
+        "user": user_input,
+        "bintabot": response,
+        "timestamp": time.time()
+    })
+    
+    # Keep only last 10 conversations to manage memory
+    if len(st.session_state.chat_history) > 10:
+        st.session_state.chat_history = st.session_state.chat_history[-10:] 
