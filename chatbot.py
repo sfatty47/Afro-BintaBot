@@ -125,12 +125,38 @@ BintaBot:"""
         # First, try RAG system for better cultural responses
         rag_response = get_rag_response(user_input, chat_history)
         
-        # If RAG provides a good response, use it
-        if rag_response and len(rag_response) > 50:
+        # Check if RAG found relevant information (not just a generic response)
+        if rag_response and len(rag_response) > 50 and not any(word in rag_response.lower() for word in ["i am here to share", "what specific aspect", "help you learn"]):
             response = rag_response
         else:
-            # Fall back to model generation
-            response = generate_response(final_prompt)
+            # Try knowledge retrieval system for online information
+            try:
+                from knowledge_retriever import get_enhanced_african_knowledge, format_knowledge_response
+                
+                with st.spinner("🔍 Searching for information about this African topic..."):
+                    enhanced_knowledge = get_enhanced_african_knowledge(user_input)
+                
+                if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
+                    formatted_response = format_knowledge_response(enhanced_knowledge)
+                    if formatted_response:
+                        # Add cultural warmth to the response
+                        response = f"""Ah, my child, let me share with you what I have learned about this topic from our collective knowledge...
+
+{formatted_response}
+
+As our elders say, 'Knowledge is like a garden: if it is not cultivated, it cannot be harvested.' Let us continue to learn and grow together.
+
+Would you like to explore more about this topic or learn about related aspects of African culture?"""
+                    else:
+                        # Fall back to model generation
+                        response = generate_response(final_prompt)
+                else:
+                    # Fall back to model generation
+                    response = generate_response(final_prompt)
+                    
+            except ImportError:
+                # Knowledge retrieval not available, fall back to model generation
+                response = generate_response(final_prompt)
         
         # Post-process to ensure cultural warmth
         if response and not response.startswith("I am BintaBot"):

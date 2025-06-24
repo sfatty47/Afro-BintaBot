@@ -285,6 +285,43 @@ CULTURAL_KNOWLEDGE = {
                 "Traditional clothing with animal skins",
                 "Warrior training and traditions"
             ]
+        },
+        "fula": {
+            "name": "Fula (Fulani)",
+            "location": "West Africa (Senegal, Guinea, Mali, Nigeria, Cameroon, Chad)",
+            "population": "Over 40 million people",
+            "language": "Fula (Niger-Congo family)",
+            "culture": [
+                "Semi-nomadic pastoralist lifestyle",
+                "Famous for their cattle herding traditions",
+                "Rich oral literature and poetry",
+                "Traditional music with flutes and drums",
+                "Elaborate traditional clothing and jewelry",
+                "Strong emphasis on education and Islamic learning"
+            ],
+            "history": "The Fula people are one of the largest ethnic groups in West Africa, known for their nomadic pastoralist traditions. They have played significant roles in the spread of Islam and the establishment of several West African empires.",
+            "traditions": [
+                "Cattle herding and nomadic lifestyle",
+                "Traditional wedding ceremonies",
+                "Islamic religious practices",
+                "Traditional healing and medicine",
+                "Storytelling and oral poetry",
+                "Traditional wrestling and sports"
+            ],
+            "values": [
+                "Hospitality and generosity",
+                "Respect for elders and ancestors",
+                "Strong family and community bonds",
+                "Education and Islamic learning",
+                "Courage and resilience",
+                "Preservation of cultural heritage"
+            ],
+            "famous_figures": [
+                "Usman dan Fodio - Founder of the Sokoto Caliphate",
+                "Ahmadu Bello - Premier of Northern Nigeria",
+                "Modibo Keita - First President of Mali",
+                "Amadou Hampâté Bâ - Famous writer and ethnologist"
+            ]
         }
     }
 }
@@ -617,6 +654,31 @@ The **{tribe_info['name']}** are one of South Africa's largest ethnic groups, wi
 The Zulu people are known for their warrior traditions, rich cultural heritage, and strong sense of community. Their traditional music, dance, and beadwork continue to inspire people around the world.
 
 Would you like to learn more about Zulu warrior traditions, their traditional music and dance, or their cattle-herding customs?"""
+
+    elif any(word in input_lower for word in ["fula", "fulani"]):
+        tribe_info = CULTURAL_KNOWLEDGE["ethnic_groups"]["fula"]
+        return f"""Ah, the Fula people! Let me share with you the rich culture and traditions of this remarkable ethnic group...
+
+The **{tribe_info['name']}** are one of the largest ethnic groups in West Africa, with over {tribe_info['population']}. They are found across {tribe_info['location']} and speak {tribe_info['language']}.
+
+**Cultural Traditions:**
+{', '.join(tribe_info['culture'])}
+
+**History:**
+{tribe_info['history']}
+
+**Traditional Practices:**
+{', '.join(tribe_info['traditions'])}
+
+**Core Values:**
+{', '.join(tribe_info['values'])}
+
+**Famous Fula Figures:**
+{', '.join(tribe_info['famous_figures'])}
+
+The Fula people have preserved their rich cultural heritage through generations, maintaining their traditions while adapting to modern times. Their emphasis on community, respect for elders, and preservation of oral history through griots makes them a shining example of African cultural resilience.
+
+Would you like to learn more about Fula music and instruments, their traditional ceremonies, or the role of griots in their society?"""
 
     # Default response with cultural warmth
     default_responses = FALLBACK_RESPONSES["default"]
