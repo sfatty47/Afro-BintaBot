@@ -1,29 +1,27 @@
-# 🌍 BintaBot - African Cultural Assistant
+# BintaBot - African Cultural Assistant
 
-BintaBot is a culturally-aware African chatbot that combines traditional wisdom with modern learning capabilities. She can learn from extensive online materials about Africa, providing accurate, comprehensive, and culturally-grounded responses.
+A culturally-aware African chatbot that shares wisdom, history, and cultural knowledge using the Mistral-7B model with a FastAPI backend and Streamlit UI.
 
-## ✨ Features
+## Features
 
-### 🧠 Enhanced Learning System
-- **Real-time Knowledge Retrieval**: Searches Wikipedia and current online sources
-- **Academic Integration**: Pulls from reliable academic sources about Africa
-- **Comprehensive Coverage**: Covers history, culture, philosophy, geography, and more
-- **Factual Accuracy**: Prevents hallucination with verified information
+### Enhanced Learning System
+- **Web Search Integration**: Searches Wikipedia and other sources for current African information
+- **Knowledge Retrieval**: Filters and processes online content for cultural relevance
+- **Dynamic Learning**: Continuously updates knowledge base with new information
 
-### 🌟 Cultural Intelligence
-- **Ancient African Empires**: Mali, Ghana, Songhai, and more
-- **Oral Traditions**: Griot storytelling and wisdom
-- **Philosophy**: Ubuntu and African community values
-- **Proverbs & Wisdom**: Traditional African sayings and teachings
-- **Cultural Greetings**: Authentic African ways of connecting
+### Cultural Intelligence
+- **Ubuntu Philosophy**: Embodies "I am because we are" in responses
+- **Proverb Integration**: Shares traditional African wisdom and proverbs
+- **Historical Accuracy**: Provides factual information about African history and cultures
+- **Cultural Sensitivity**: Respects diverse African traditions and perspectives
 
-### 🎯 Smart Response System
-- **Context-Aware**: Understands cultural nuances
-- **Multi-Source Learning**: Combines built-in knowledge with online research
-- **Fallback Protection**: Graceful degradation when online sources unavailable
-- **Timeout Handling**: Fast responses even with complex queries
+### Smart Response System
+- **Topic Detection**: Automatically identifies query intent (history, culture, music, etc.)
+- **Response Cleaning**: Removes repetition and improves clarity
+- **Context Awareness**: Maintains conversation context and avoids redundancy
+- **Fallback Responses**: Provides culturally-rich responses when external sources are unavailable
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Cloud Version (Recommended)
 1. Visit the Streamlit Cloud deployment
@@ -43,23 +41,23 @@ pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
-## 📚 Knowledge Sources
+## Knowledge Sources
 
 BintaBot learns from multiple sources:
 
-### 🔍 Online Learning
+### Online Learning
 - **Wikipedia**: Academic information about African topics
 - **DuckDuckGo Search**: Current information and news
 - **Cultural Databases**: African history and traditions
 - **Academic Sources**: Scholarly articles and research
 
-### 📖 Built-in Knowledge
+### Built-in Knowledge
 - **Historical Empires**: Detailed information about Mali, Ghana, Songhai
 - **Cultural Figures**: Sundiata Keita, Mansa Musa, and more
 - **Philosophical Traditions**: Ubuntu and African wisdom
 - **Oral Traditions**: Griot storytelling and proverbs
 
-## 🎓 Learning Categories
+## Learning Categories
 
 ### History
 - African empires and kingdoms
@@ -85,7 +83,7 @@ BintaBot learns from multiple sources:
 - Wildlife and ecosystems
 - Cities and landmarks
 
-## 💬 Example Conversations
+## Example Conversations
 
 **User**: "Tell me about Sundiata Keita"
 **BintaBot**: *Searches online sources and provides comprehensive information about the founder of the Mali Empire, including his childhood, battles, and legacy*
@@ -96,7 +94,7 @@ BintaBot learns from multiple sources:
 **User**: "Share an African proverb"
 **BintaBot**: *Shares traditional wisdom like "It takes a village to raise a child" with cultural context*
 
-## 🔧 Technical Architecture
+## Technical Architecture
 
 ### Model System
 - **Primary**: Mistral-7B-Instruct-v0.2 (with Hugging Face authentication)
@@ -114,7 +112,7 @@ BintaBot learns from multiple sources:
 - **Fallback Responses**: Cultural knowledge when models fail
 - **Graceful Degradation**: Maintains functionality with partial failures
 
-## 🌐 Deployment
+## Deployment
 
 ### Streamlit Cloud
 - Text-based interface with enhanced learning
@@ -128,14 +126,14 @@ BintaBot learns from multiple sources:
 - Offline knowledge base
 - Customizable configuration
 
-## 🔐 Security & Privacy
+## Security & Privacy
 
 - **No Data Storage**: Conversations are not stored
 - **Secure Authentication**: Hugging Face tokens via Streamlit secrets
 - **Privacy-First**: No personal information collection
 - **Open Source**: Transparent and auditable code
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions to enhance BintaBot's knowledge and capabilities:
 
@@ -144,17 +142,15 @@ We welcome contributions to enhance BintaBot's knowledge and capabilities:
 3. **Language Support**: Add more African languages
 4. **Feature Development**: Enhance learning algorithms
 
-## 📄 License
+## License
 
 This project is open source and available under the MIT License.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - African griots and oral tradition keepers
 - Academic researchers of African history and culture
 - Open source community for tools and libraries
 - Cultural experts who preserve African wisdom
 
----
-
-*BintaBot: "I am because we are" - Learning and sharing the wisdom of Africa together.* 🌍 
+*BintaBot: "I am because we are" - Learning and sharing the wisdom of Africa together.* 

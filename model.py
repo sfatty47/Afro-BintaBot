@@ -424,7 +424,7 @@ def get_tokenizer():
                     trust_remote_code=True
                 )
                 _using_fallback = False
-                st.success("✅ Successfully loaded Mistral-7B model!")
+                st.success("Successfully loaded Mistral-7B model!")
             else:
                 raise Exception("No Hugging Face token provided")
                 
@@ -841,7 +841,7 @@ def generate_response(prompt):
         
         # First, try to get enhanced knowledge from online sources
         if KNOWLEDGE_RETRIEVAL_AVAILABLE:
-            with st.spinner("🔍 Searching for the latest information about Africa..."):
+            with st.spinner("Searching for the latest information about Africa..."):
                 enhanced_knowledge = get_enhanced_african_knowledge(user_input)
                 
             if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):

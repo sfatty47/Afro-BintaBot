@@ -32,7 +32,7 @@ def listen_for_speech(recognizer, microphone):
             st.info("🎤 Listening... Speak now!")
             audio = recognizer.listen(source, timeout=5, phrase_time_limit=10)
         
-        st.info("🔄 Processing speech...")
+        st.info("Processing speech...")
         text = recognizer.recognize_google(audio)
         return text.lower()
     except sr.WaitTimeoutError:
@@ -69,9 +69,9 @@ def main():
     # Initialize voice components
     try:
         recognizer, microphone, tts_engine = init_voice()
-        st.success("✅ Voice system initialized successfully!")
+        st.success("Voice system initialized successfully!")
     except Exception as e:
-        st.error(f"❌ Failed to initialize voice system: {e}")
+        st.error(f"Failed to initialize voice system: {e}")
         st.info("Please ensure you have a microphone connected and the required packages installed.")
         return
     
@@ -89,7 +89,7 @@ def main():
         st.text_area("🎤 Voice Input:", value=st.session_state.voice_input, height=100)
     
     # Main chat interface
-    st.header("💬 Chat with BintaBot")
+    st.header("Chat with BintaBot")
     
     # Initialize chat history
     if "messages" not in st.session_state:

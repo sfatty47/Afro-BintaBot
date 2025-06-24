@@ -13,7 +13,7 @@ except ImportError:
 # Page configuration
 st.set_page_config(
     page_title="BintaBot - African Cultural Assistant",
-    page_icon="🌍",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -22,12 +22,19 @@ st.set_page_config(
 st.markdown("""
 <style>
     .main-header {
-        background: linear-gradient(90deg, #FF6B6B, #4ECDC4);
+        background: linear-gradient(90deg, #2E8B57, #228B22);
         padding: 2rem;
         border-radius: 10px;
-        margin-bottom: 2rem;
-        text-align: center;
         color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .feature-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        border-left: 4px solid #2E8B57;
+        margin: 1rem 0;
     }
     .chat-message {
         padding: 1rem;
@@ -57,11 +64,11 @@ st.markdown("""
         margin: 1rem 0;
     }
     .cultural-highlight {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        background: linear-gradient(135deg, #FFD700, #FFA500);
         padding: 1rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-        border-left: 4px solid #ff8c42;
+        border-radius: 8px;
+        color: #333;
+        margin: 0.5rem 0;
     }
     .empire-timeline {
         background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
@@ -204,7 +211,7 @@ def main():
     # Header
     st.markdown("""
     <div class="main-header">
-        <h1>🌍 BintaBot - African Cultural Assistant</h1>
+        <h1>BintaBot - African Cultural Assistant</h1>
         <p>Your wise companion for exploring African culture, history, and wisdom</p>
     </div>
     """, unsafe_allow_html=True)
@@ -212,18 +219,25 @@ def main():
     # Model status indicator
     if not check_model_status():
         st.markdown("""
-        <div class="status-box">
-            <h4>🔄 Loading BintaBot's Wisdom...</h4>
+        <div class="feature-box">
+            <h4>Loading BintaBot's Wisdom...</h4>
             <p>BintaBot is loading her knowledge of African culture, history, and wisdom. This may take a moment on first startup.</p>
         </div>
         """, unsafe_allow_html=True)
-        st.info("💡 Tip: If loading takes too long, try refreshing the page.")
+        st.info("Tip: If loading takes too long, try refreshing the page.")
+        
+        # Show loading progress
+        progress_bar = st.progress(0)
+        for i in range(100):
+            time.sleep(0.01)
+            progress_bar.progress(i + 1)
+        st.success("BintaBot is ready to share wisdom!")
     
     # Knowledge retrieval status
     if KNOWLEDGE_RETRIEVAL_AVAILABLE:
         st.markdown("""
-        <div class="knowledge-box">
-            <h4>🔍 Enhanced Learning Active</h4>
+        <div class="feature-box">
+            <h4>Enhanced Learning Active</h4>
             <p>BintaBot can now search and learn from online materials about Africa, including Wikipedia and current sources!</p>
         </div>
         """, unsafe_allow_html=True)
@@ -234,84 +248,36 @@ def main():
     create_cultural_widgets()
     
     # Main content area with tabs
-    tab1, tab2, tab3 = st.tabs(["💬 Chat with BintaBot", "🗺️ Cultural Explorer", "📚 Learning Center"])
+    tab1, tab2, tab3 = st.tabs(["Chat with BintaBot", "Cultural Explorer", "Learning Center"])
     
     with tab1:
-        # Main chat interface
-        col1, col2 = st.columns([3, 1])
+        st.markdown("### Chat with BintaBot")
+        
+        # Chat interface
+        culturally_aware_chat()
+        
+        # Quick actions
+        st.markdown("### Quick Actions")
+        
+        col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.markdown("### 💬 Chat with BintaBot")
-            
-            # Display chat history
-            for message in st.session_state.messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-            
-            # Chat input
-            if prompt := st.chat_input("Ask BintaBot about African culture, history, or wisdom..."):
-                # Add user message to chat history
-                st.session_state.messages.append({"role": "user", "content": prompt})
-                with st.chat_message("user"):
-                    st.markdown(prompt)
+            if st.button("Ask about History"):
+                st.session_state.quick_question = "Tell me about the Mali Empire"
                 
-                # Generate response with cultural warmth
-                with st.chat_message("assistant"):
-                    with st.spinner("BintaBot is thinking..."):
-                        response = culturally_aware_chat(prompt, st.session_state.chat_history)
-                        st.markdown(response)
-                
-                # Add bot response to chat history
-                st.session_state.messages.append({"role": "assistant", "content": response})
-                
-                # Add to conversation history for memory
-                add_to_chat_history(prompt, response)
-        
         with col2:
-            st.markdown("### 🎯 Quick Actions")
-            
-            # Quick question buttons
-            quick_questions = [
-                "Tell me about Ubuntu philosophy",
-                "Share an African proverb",
-                "What is griot storytelling?",
-                "Tell me about the Mali Empire",
-                "What are some African languages?",
-                "Share wisdom about community"
-            ]
-            
-            for question in quick_questions:
-                if st.button(question, key=f"quick_{question[:20]}"):
-                    # Add user message
-                    st.session_state.messages.append({"role": "user", "content": question})
-                    
-                    # Generate response
-                    with st.spinner("BintaBot is thinking..."):
-                        response = culturally_aware_chat(question, st.session_state.chat_history)
-                    
-                    # Add bot response
-                    st.session_state.messages.append({"role": "assistant", "content": response})
-                    
-                    # Add to history
-                    add_to_chat_history(question, response)
-                    
-                    # Rerun to show new messages
-                    st.rerun()
-            
-            st.markdown("---")
-            
-            # Chat controls
-            if st.button("🗑️ Clear Chat History"):
-                st.session_state.messages = []
-                st.session_state.chat_history = []
-                st.rerun()
-            
-            if st.button("🔄 New Session"):
-                st.session_state.messages = []
-                st.session_state.chat_history = []
-                st.session_state.daily_proverb = culturally_aware_chat.get_daily_proverb()
-                st.session_state.did_you_know = culturally_aware_chat.get_did_you_know_fact()
-                st.rerun()
+            if st.button("Ask about Culture"):
+                st.session_state.quick_question = "What is Ubuntu philosophy?"
+                
+        with col3:
+            if st.button("Ask about Music"):
+                st.session_state.quick_question = "Tell me about African drums"
+        
+        # New session button
+        if st.button("New Session"):
+            st.session_state.chat_history = []
+            st.session_state.quick_question = ""
+            st.rerun()
     
     with tab2:
         st.markdown("### 🗺️ Explore African Culture")
@@ -326,49 +292,28 @@ def main():
         create_language_guide()
     
     with tab3:
-        st.markdown("### 📚 Learning Center")
+        st.markdown("### Learning Center")
         
-        # Educational content
-        col1, col2 = st.columns(2)
+        # Learning resources
+        st.markdown("""
+        <div class="feature-box">
+            <h4>Learning Tips:</h4>
+            <ul>
+                <li>Ask specific questions to get detailed answers</li>
+                <li>Use follow-up questions to explore topics deeper</li>
+                <li>Try asking about different aspects of African culture</li>
+                <li>Learn about historical figures and their legacies</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
         
-        with col1:
-            st.markdown("""
-            <div class="cultural-highlight">
-                <h4>🎓 What You Can Learn:</h4>
-                <ul>
-                    <li><strong>Philosophy:</strong> Ubuntu, African wisdom traditions</li>
-                    <li><strong>History:</strong> Great African empires and kingdoms</li>
-                    <li><strong>Culture:</strong> Traditions, customs, and celebrations</li>
-                    <li><strong>Languages:</strong> African linguistic diversity</li>
-                    <li><strong>Arts:</strong> Music, dance, visual arts, storytelling</li>
-                    <li><strong>Values:</strong> Community, respect, wisdom, heritage</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-            <div class="fact-card">
-                <h4>💡 Learning Tips:</h4>
-                <ul>
-                    <li>Ask BintaBot specific questions</li>
-                    <li>Use the quick action buttons</li>
-                    <li>Explore different cultural topics</li>
-                    <li>Ask for proverbs and stories</li>
-                    <li>Learn about different regions</li>
-                    <li>Connect with African wisdom</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    # Footer with cultural information
-    st.markdown("---")
-    st.markdown("""
-    <div style="text-align: center; padding: 1rem; background-color: #f0f2f6; border-radius: 10px;">
-        <p><strong>🌍 BintaBot</strong> - Connecting you to the wisdom of Africa</p>
-        <p>Learn about cultures, history, proverbs, and the spirit of Ubuntu</p>
-    </div>
-    """, unsafe_allow_html=True)
+        # Footer
+        st.markdown("---")
+        st.markdown("""
+        <div style="text-align: center; color: #666; padding: 2rem;">
+            <p><strong>BintaBot</strong> - Connecting you to the wisdom of Africa</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main() 

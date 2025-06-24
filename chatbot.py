@@ -187,7 +187,7 @@ BintaBot:"""
                     try:
                         from knowledge_retriever import get_enhanced_african_knowledge, format_knowledge_response
                         
-                        with st.spinner(f"🔍 Searching for information about {topic}..."):
+                        with st.spinner(f"Searching for information about {topic}..."):
                             enhanced_knowledge = get_enhanced_african_knowledge(user_input)
                         
                         if enhanced_knowledge and (enhanced_knowledge.get('wikipedia') or enhanced_knowledge.get('web_results')):
@@ -291,18 +291,14 @@ def create_cultural_widgets():
     """Create cultural widgets for the sidebar"""
     st.sidebar.markdown("---")
     
-    # Daily Proverb
-    st.sidebar.markdown("### 🌟 Proverb of the Day")
-    proverb = get_daily_proverb()
-    st.sidebar.info(f'*"{proverb}"*')
+    # Sidebar with cultural elements
+    st.sidebar.markdown("### Proverb of the Day")
+    st.sidebar.info(get_daily_proverb())
     
-    # Did You Know?
-    st.sidebar.markdown("### 💡 Did You Know?")
-    fact = get_did_you_know_fact()
-    st.sidebar.success(fact)
+    st.sidebar.markdown("### Did You Know?")
+    st.sidebar.info(get_did_you_know_fact())
     
-    # Cultural Topics
-    st.sidebar.markdown("### 🎯 Explore African Culture")
+    st.sidebar.markdown("### Explore African Culture")
     topics = [
         "Ancient African Empires",
         "African Proverbs & Wisdom", 
